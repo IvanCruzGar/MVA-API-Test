@@ -1,0 +1,31 @@
+{"setId": 2, 
+ "magic": None, 
+ "endDate": None, 
+ "smallBlob": None, 
+ "largeBlob": None, 
+ "jsonBlob": 
+    "{"
+        profile":
+            {
+                "ActionType":"train", 
+                "AgentAlgo":"GMM", 
+                "FilterLength":3, 
+            "MinAlertDuration":2, 
+            "EventThreshold":0.5, 
+            "OperatingState":3, 
+            "DistanceType":"euclidean", 
+            "IterDropRate":5, 
+            "Iterations":200, 
+            "AgentType":"anomaly", 
+            "TrainRange":[["2013-01-01T00:00:00.000Z", 
+            "2015-12-31T00:00:00.000Z"]]}}", 
+ "granularityId": 21, 
+ "startDate": "2022-04-26T20:29:16.313", 
+ "lifeSpan": 0, 
+ "doubleCollections": None, 
+ "integerCollections": None, 
+ "applicationId": 1, 
+ "componentTypeId": 1, 
+ "componentId": 140, 
+ "datasetTypeId": 1, 
+ "version": ""}

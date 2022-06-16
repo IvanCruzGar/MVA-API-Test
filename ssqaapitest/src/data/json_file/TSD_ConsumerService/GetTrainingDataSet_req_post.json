@@ -1,0 +1,315 @@
+{
+	"startDate": "2009-12-31T23:00:00Z",
+	"endDate": "2019-07-01T06:00:00Z",
+	"granularityId": 21,
+	"timeBit": 3600000,
+	"collectStatistics": false,
+	"returnData": true,
+	"tagDescriptors": {
+		"278": {
+			"TagDetails": {
+				"Name": "S51TI301_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"279": {
+			"TagDetails": {
+				"Name": "S51PI300_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"280": {
+			"TagDetails": {
+				"Name": "S51TI216_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"281": {
+			"TagDetails": {
+				"Name": "S51PI306_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"282": {
+			"TagDetails": {
+				"Name": "S51PDI309_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"283": {
+			"TagDetails": {
+				"Name": "S51PI308_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"284": {
+			"TagDetails": {
+				"Name": "S51TI310_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"287": {
+			"TagDetails": {
+				"Name": "S51TI006_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"286": {
+			"TagDetails": {
+				"Name": "S51TI003_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"288": {
+			"TagDetails": {
+				"Name": "S51PDI005_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"289": {
+			"TagDetails": {
+				"Name": "S51PI305_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"290": {
+			"TagDetails": {
+				"Name": "S51TI308_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"291": {
+			"TagDetails": {
+				"Name": "S51TI309_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"285": {
+			"TagDetails": {
+				"Name": "S51TI016_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"277": {
+			"TagDetails": {
+				"Name": "S51PI301_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"262": {
+			"TagDetails": {
+				"Name": "S51PI090_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"275": {
+			"TagDetails": {
+				"Name": "S51TI300_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"263": {
+			"TagDetails": {
+				"Name": "S51TI303_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"264": {
+			"TagDetails": {
+				"Name": "S51TI304_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"265": {
+			"TagDetails": {
+				"Name": "S51TI305_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"266": {
+			"TagDetails": {
+				"Name": "S51TI306_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"276": {
+			"TagDetails": {
+				"Name": "S51FI074_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"268": {
+			"TagDetails": {
+				"Name": "S51TI313_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"267": {
+			"TagDetails": {
+				"Name": "S51TI312_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"270": {
+			"TagDetails": {
+				"Name": "S51TI315_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"271": {
+			"TagDetails": {
+				"Name": "S51TI316_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"272": {
+			"TagDetails": {
+				"Name": "S51TI307_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"273": {
+			"TagDetails": {
+				"Name": "S51FI008_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"274": {
+			"TagDetails": {
+				"Name": "S51FI073_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		},
+		"269": {
+			"TagDetails": {
+				"Name": "S51TI314_PV",
+				"Outliers": {
+					"Floor": 100.0,
+					"Ceiling": 500.0,
+					"Replacement": 100
+				}
+			}
+		}
+	},
+	"applicationId": 1,
+	"componentTypeId": 1,
+	"componentId": 87,
+	"datasetTypeId": 2
+}
+

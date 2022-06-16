@@ -1,0 +1,37 @@
+[
+    {
+      "descriptionProvider": "None",
+      "rowId": 0,
+      "id": null
+    },
+    {
+      "descriptionProvider": "Plant Historian",
+      "rowId": 1,
+      "id": null
+    },
+    {
+      "descriptionProvider": "Calculated",
+      "rowId": 2,
+      "id": null
+    },
+    {
+      "descriptionProvider": "OPC Data Access",
+      "rowId": 3,
+      "id": null
+    },
+    {
+      "descriptionProvider": "System Platform",
+      "rowId": 4,
+      "id": null
+    },
+    {
+      "descriptionProvider": "Asset Health System",
+      "rowId": 5,
+      "id": null
+    },
+    {
+      "descriptionProvider": "OPC Alarms & Events",
+      "rowId": 6,
+      "id": null
+    }
+  ]

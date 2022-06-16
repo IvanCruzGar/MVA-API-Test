@@ -1,0 +1,7 @@
+{
+  "test_my_api/alert/test_alert_my_api.py::TestListElements::test_get_alert": true,
+  "test_my_api/alert/test_alert_my_api.py::TestListElements::test_get_alertids": true,
+  "test_my_api/object/test_objet_my_api.py::TestListElements::test_get_Workitemsrelated1": true,
+  "tests/alert/test_get_alerts.py": true,
+  "tests/equipment_set/equipment_set.py": true
+}

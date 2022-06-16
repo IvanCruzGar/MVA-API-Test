@@ -1,0 +1,87 @@
+{
+    "10": {
+        "granularityId": 10,
+        "value": 125,
+        "description": "1/8 sec"
+    },
+    "11": {
+        "granularityId": 11,
+        "value": 250,
+        "description": "1/4 sec"
+    },
+    "12": {
+        "granularityId": 12,
+        "value": 500,
+        "description": "1/2 sec"
+    },
+    "13": {
+        "granularityId": 13,
+        "value": 1000,
+        "description": "1 second"
+    },
+    "14": {
+        "granularityId": 14,
+        "value": 5000,
+        "description": "5 seconds"
+    },
+    "15": {
+        "granularityId": 15,
+        "value": 15000,
+        "description": "15 seconds"
+    },
+    "16": {
+        "granularityId": 16,
+        "value": 30000,
+        "description": "30 sec"
+    },
+    "17": {
+        "granularityId": 17,
+        "value": 60000,
+        "description": "1 minute"
+    },
+    "18": {
+        "granularityId": 18,
+        "value": 300000,
+        "description": "5 minutes"
+    },
+    "19": {
+        "granularityId": 19,
+        "value": 900000,
+        "description": "15 minutes"
+    },
+    "20": {
+        "granularityId": 20,
+        "value": 1800000,
+        "description": "30 minutes"
+    },
+    "21": {
+        "granularityId": 21,
+        "value": 3600000,
+        "description": "1 hour"
+    },
+    "22": {
+        "granularityId": 22,
+        "value": 10800000,
+        "description": "3 hours"
+    },
+    "23": {
+        "granularityId": 23,
+        "value": 21600000,
+        "description": "6 hours"
+    },
+    "24": {
+        "granularityId": 24,
+        "value": 43200000,
+        "description": "12 hours"
+    },
+    "25": {
+        "granularityId": 25,
+        "value": 86400000,
+        "description": "1 day"
+    },
+    "26": {
+        "granularityId": 26,
+        "value": 604800000,
+        "description": "1 week"
+    }
+}

@@ -1,0 +1,62 @@
+[
+    {
+        "tagId": 278,
+        "granularity": {
+            "granularityId": 21,
+            "value": 3600000,
+            "description": "1 hour"
+        },
+        "presentData": [
+            {
+                "key": "2009-12-31T23:00:00",
+                "value": "2019-07-01T05:00:00"
+            }
+        ],
+        "absentData": []
+    },
+    {
+        "tagId": 279,
+        "granularity": {
+            "granularityId": 21,
+            "value": 3600000,
+            "description": "1 hour"
+        },
+        "presentData": [
+            {
+                "key": "2009-12-31T23:00:00",
+                "value": "2019-07-01T05:00:00"
+            }
+        ],
+        "absentData": []
+    },
+    {
+        "tagId": 280,
+        "granularity": {
+            "granularityId": 21,
+            "value": 3600000,
+            "description": "1 hour"
+        },
+        "presentData": [
+            {
+                "key": "2009-12-31T23:00:00",
+                "value": "2019-07-01T05:00:00"
+            }
+        ],
+        "absentData": []
+    },
+    {
+        "tagId": 281,
+        "granularity": {
+            "granularityId": 21,
+            "value": 3600000,
+            "description": "1 hour"
+        },
+        "presentData": [
+            {
+                "key": "2009-12-31T23:00:00",
+                "value": "2019-07-01T05:00:00"
+            }
+        ],
+        "absentData": []
+    }
+]

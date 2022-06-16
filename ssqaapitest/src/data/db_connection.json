@@ -1,0 +1,8 @@
+{
+  "server": "10.210.0.50",
+  "port": "1433",
+  "user": "sa",
+  "password": "Aspen100",
+  "database": "Mtell_Automation_MVT",
+  "charset": "utf8"
+}

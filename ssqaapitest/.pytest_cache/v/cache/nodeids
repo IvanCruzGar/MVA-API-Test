@@ -1,0 +1,9 @@
+[
+  "test/MVArestAPI/test_MVA.py::TestListElements::test_MVAConfig",
+  "test/MVArestAPI/test_MVA.py::TestListElements::test_MVADS",
+  "test/MVArestAPI/test_MVA.py::TestListElements::test_MVAMod",
+  "test/MVArestAPI/test_MVA.py::TestListElements::test_MVAtc",
+  "test_my_api/alert/test_alert_my_api.py::TestListElements::test_get_alert",
+  "test_my_api/alert/test_alert_my_api.py::TestListElements::test_get_alertids",
+  "test_my_api/object/test_objet_my_api.py::TestListElements::test_get_Workitemsrelated1"
+]
