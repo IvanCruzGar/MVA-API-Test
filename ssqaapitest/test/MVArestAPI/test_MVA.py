@@ -16,35 +16,34 @@ import logging as logger
 class TestListElements(unittest.TestCase):
 
     #/TSDRetrieval/QueryTsd
-    @pytest.mark.DataSourceList
+    @pytest.mark.vsts787805
     def test_MVADS(self):
         
         logger.debug(self.id())
-        logger.debug("Hola mundo")
         endpoints = Endpoints()
         res = endpoints.get_DSList()
         jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('DSList_otro.json')
+        resExp = jsonUtil.read_Json('DSList_new.json')
         self.assertEqual(res, resExp)
 
-    @pytest.mark.ModelList
+    @pytest.mark.vsts787809
     def test_MVAMod(self):
         
         logger.debug(self.id())
         endpoints = Endpoints()
         res = endpoints.get_ModelList()
         jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('ModelList_otro.json')
+        resExp = jsonUtil.read_Json('ModelList_new.json')
         self.assertEqual(res, resExp)
 
-    @pytest.mark.ConfigList
+    @pytest.mark.vsts787828
     def test_MVAConfig(self):
         
         logger.debug(self.id())
         endpoints = Endpoints()
         res = endpoints.get_ConfigurationList()
         jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('ConfigurationList_otro.json')
+        resExp = jsonUtil.read_Json('ConfigurationList_new.json')
         self.assertEqual(res, resExp)
 
         

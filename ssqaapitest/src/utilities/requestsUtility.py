@@ -33,25 +33,33 @@ class RequestsUtility(object):
                                                               f"URL:{self.url}, Response Json: {self.rs_json} "
 
     def post(self, endpoint, payload=None, params=None, headers=None, expected_status_code=200, resEmpty=False):
-        if not headers:
-            headers = {"Content-Type": "application/json"}
+        # if not headers:
+        #     headers = {"Content-Type": "application/json"}
 
         if self.bearerToken:
             headers['Authorization'] = 'Bearer ' + self.bearerToken
 
         self.url = self.base_url + endpoint
-
+        
         if type(payload) == dict:
             payload = json.dumps(payload)
         else:
             payload = str(payload)
             payload = payload.replace('\'', '"')
+        
+        
         rs_api = requests.post(url=self.url, data=payload, params=params, headers=headers, verify=False)
         self.status_code = rs_api.status_code
         self.expected_status_code = expected_status_code
-
+        
+        
         self.rs_json = rs_api.json() if (resEmpty == False) else {}
         self.assert_status_code()
+
+        # logger.debug('Sin decodificar')
+        # logger.debug(self.rs_json)
+        # logger.debug('Con decodificar')
+        # logger.debug(rs_api.content.decode('utf-8-sig'))
 
         #logger.debug(f"POST API response: {self.status_code}")
         #logger.debug(f"POST API response: {self.rs_json}")
@@ -73,11 +81,13 @@ class RequestsUtility(object):
         else:
             payload = str(payload)
         rs_api = requests.get(url=self.url, data=payload, params=params, headers=headers, verify=False)
+        logger.debug('Mando esto' + str(rs_api))
         self.status_code = rs_api.status_code
         self.expected_status_code = expected_status_code
-
+        
         self.rs_json = rs_api.json() if (resEmpty == False) else {}
         self.assert_status_code()
+        
 
         #logger.debug(f"API GET response: {self.rs_json}")
         return self.rs_json

@@ -17,7 +17,7 @@ class RequestsMVUtility(object):
         self.AccessToken = data['AccessToken']
         logger.debug(self.AccessToken)
         
-        self.requesUtility = RequestsUtility(bearerToken=self.AccessToken)
+        self.requesUtility = RequestsUtility(accessToken=self.AccessToken)
 
 
 
@@ -25,8 +25,8 @@ class RequestsMVUtility(object):
         head = {'AccessToken': self.AccessToken}
         response = requests.get(self.base_url+endpoint, headers=head)
         #logger.debug(response.content)
-        #logger.debug('Respuesta')
-        #response2 = self.requesUtility.get('DataSource/List')
+        logger.debug('Respuesta')
+        response2 = self.requesUtility.get('DataSource/List')
         #logger.debug(response2)
         return response.content.decode('utf-8-sig')
 
