@@ -15,10 +15,12 @@ class Endpoints(object):
         
         self.requestUtility = RequestsUtility()
         auth= "/auth/LogIn"
-        otroNombre = {"username" : "TestApi", "password" : "Aspen101"}
+        otroNombre = {"username" : "TesterApi", "password" : "Aspen101"}
         
         response = self.requestUtility.post('/auth/LogIn', payload=otroNombre)
         #logger.debug('Esto salio: '+str(response))
+        logger.debug(type(response))
+        logger.debug(response)
         self.AccessToken = response['AccessToken']
         
         self.requestUtility.AccessToken = self.AccessToken
@@ -26,9 +28,9 @@ class Endpoints(object):
         
     def get_DSList(self):
         api_res = self.requestUtility.get("/DataSource/List")
-        # with open('DSList_new.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
+        with open('DSList_new.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
         logger.debug(api_res)
         return api_res
 

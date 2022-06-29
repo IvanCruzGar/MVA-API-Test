@@ -55,19 +55,16 @@ class RequestsUtility(object):
         
         self.rs_json = rs_api.json() if (resEmpty == False) else {}
         self.assert_status_code()
-
-        # logger.debug('Sin decodificar')
-        # logger.debug(self.rs_json)
-        # logger.debug('Con decodificar')
-        # logger.debug(rs_api.content.decode('utf-8-sig'))
+     
 
         #logger.debug(f"POST API response: {self.status_code}")
         #logger.debug(f"POST API response: {self.rs_json}")
+
         return self.rs_json
 
     def get(self, endpoint, payload=None, params=None, headers=None, expected_status_code=200, resEmpty=False):
-        if not headers:
-            headers = {"Content-Type": "application/json"}
+        # if not headers:
+        #     headers = {"Content-Type": "application/json"}
 
         if self.bearerToken:
             headers['Authorization'] = 'Bearer ' + self.bearerToken
