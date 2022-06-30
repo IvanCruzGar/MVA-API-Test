@@ -1,0 +1,23 @@
+{
+  "Metadata": {
+    "Title": "Principal Component Analysis (Mean centered)",
+    "Algorithm used": "SVD",
+    "Validation method": "Cross validation",
+    "Cross validation method": "Random with 20 segments ",
+    "Total number of components": "7",
+    "Components suggested by model": "0",
+    "Optimal number of components": "1",
+    "Raw data used": "",
+    "       Data Matrix used ": "X",
+    "       Name": "X",
+    "       Type": "Non-spectra data ",
+    "       Size": "25 samples, 10 variables",
+    "       Sample set": "1-25",
+    "       Variable set": "1-10",
+    "       Samples kept out": "",
+    "       Variables kept out": "",
+    "       Variable weights": "All1.00",
+    "Created": "29.06.2018 12",
+    "Computation time": "00"
+  }
+}

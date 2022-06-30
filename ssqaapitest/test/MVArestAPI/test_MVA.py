@@ -55,4 +55,92 @@ class TestListElements(unittest.TestCase):
         self.assertEqual(res, resExp,"The Json of Configurations Failed")
 
         
+    @pytest.mark.vsts787818
+    def test_MVAConfR(self):
         
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_ConfRunList()
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('ConfRunsList.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788343
+    def test_MVARawDataID(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RawDataID()
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataID.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788346
+    def test_MVARawDataFNR(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RawDataFNR()
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataFNR.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788347
+    def test_MVARawDataOFF(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RawDataOFF()
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataOFF.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788731
+    def test_MVARModMetaID(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RModelMetaMRID()
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('ModelMetaID.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    # @pytest.mark.vsts788393
+    # def test_MVARRMNFull(self):
+        
+    #     logger.debug(self.id())
+    #     endpoints = Endpoints()
+    #     res = endpoints.get_RRMNFull()
+    #     jsonUtil = JsonUtility('MVArestAPI')
+    #     resExp = jsonUtil.read_Json('ResMatFull.json')
+    #     self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788391
+    def test_MVARRMConfRun(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMConfRun()
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('ResMatConfRun.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788736
+    def test_MVARDSMetaDSId(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDSMetaDSId()
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RDSMetaDSId.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788755
+    def test_MVARConfMetaConfId(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RConfMetaConfId()
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RConfMetaConfId.json')
+        self.assertEqual(res, resExp,"Something went wrong")
