@@ -10,6 +10,7 @@ API_HOSTS = {
     "prod": "",
     "tsd":"http://172.22.4.151:8080/Aspentech/APM/",
     "MVApp":"http://172.22.4.62:9001/AspenProcessPulse/api",
+    "MVAAut":"http://REEMPLAZAR:9001/AspenProcessPulse/api",
 }
 
 DB_HOST = {
