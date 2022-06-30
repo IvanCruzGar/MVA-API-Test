@@ -16,6 +16,14 @@ import logging as logger
 class TestListElements(unittest.TestCase):
 
     #/TSDRetrieval/QueryTsd
+    @pytest.mark.vsts790591
+    def test_MVAWEP(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_WEndP()
+        self.assertEqual(res,res)
+
     @pytest.mark.vsts787805
     def test_MVADS(self):
         
@@ -24,7 +32,7 @@ class TestListElements(unittest.TestCase):
         res = endpoints.get_DSList()
         jsonUtil = JsonUtility('MVArestAPI')
         resExp = jsonUtil.read_Json('DSList_new.json')
-        self.assertEqual(res, resExp)
+        self.assertEqual(res, resExp,"The Json of Data Sources Failed")
 
     @pytest.mark.vsts787809
     def test_MVAMod(self):
@@ -34,7 +42,7 @@ class TestListElements(unittest.TestCase):
         res = endpoints.get_ModelList()
         jsonUtil = JsonUtility('MVArestAPI')
         resExp = jsonUtil.read_Json('ModelList_new.json')
-        self.assertEqual(res, resExp)
+        self.assertEqual(res, resExp,"The Json of Models Failed")
 
     @pytest.mark.vsts787828
     def test_MVAConfig(self):
@@ -44,7 +52,7 @@ class TestListElements(unittest.TestCase):
         res = endpoints.get_ConfigurationList()
         jsonUtil = JsonUtility('MVArestAPI')
         resExp = jsonUtil.read_Json('ConfigurationList_new.json')
-        self.assertEqual(res, resExp)
+        self.assertEqual(res, resExp,"The Json of Configurations Failed")
 
         
         

@@ -77,10 +77,9 @@ class RequestsUtility(object):
             payload = json.dumps(payload)
         else:
             payload = str(payload)
-        logger.debug("Esto arroja mi buen")
-        logger.debug(self.accessToken)
+      
         rs_api = requests.get(url=self.url, data=payload, params=params, headers=headers, verify=False)
-        logger.debug('Mando esto' + str(rs_api))
+        #logger.debug('Mando esto' + str(rs_api))
         self.status_code = rs_api.status_code
         self.expected_status_code = expected_status_code
         

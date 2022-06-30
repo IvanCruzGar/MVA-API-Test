@@ -18,33 +18,39 @@ class Endpoints(object):
         otroNombre = {"username" : "TesterApi", "password" : "Aspen101"}
         
         response = self.requestUtility.post('/auth/LogIn', payload=otroNombre)
-        logger.debug('Esto salio:')
-        logger.debug(response['AccessToken'])
+        # logger.debug('Esto salio:')
+        #logger.debug(response)
         self.requestUtility.accessToken = response['AccessToken']
         
-
         
+
+     
+    def get_WEndP(self):
+        api_res = self.requestUtility.get("/DataSource/Listo", expected_status_code = 404, resEmpty = True)
+        # with open('DSList_new.json', 'w') as f:
+        #     json.dump(api_res, f, indent=2)
+        #     logger.debug('Quedo tu archivo chavo')
+        # logger.debug(api_res)
+        return api_res
+
     def get_DSList(self):
         api_res = self.requestUtility.get("/DataSource/List")
-        with open('DSList_new.json', 'w') as f:
-            json.dump(api_res, f, indent=2)
-            logger.debug('Quedo tu archivo chavo')
-        logger.debug(api_res)
+        # with open('DSList_new.json', 'w') as f:
+        #     json.dump(api_res, f, indent=2)
+        #     logger.debug('Quedo tu archivo chavo')
+        # logger.debug(api_res)
         return api_res
 
     def get_ModelList(self):
         api_res = self.requestUtility.get("/Model/List")
-        with open('ModelList_new.json', 'w') as f:
-            json.dump(api_res, f, indent=2)
-            logger.debug('Quedo tu archivo chavo')
+        # with open('ModelList_new.json', 'w') as f:
+        #     json.dump(api_res, f, indent=2)
+        #     logger.debug('Quedo tu archivo chavo')
         return api_res
 
     def get_ConfigurationList(self):
         api_res = self.requestUtility.get("/Configuration/List")
-        with open('ConfigurationList_new.json', 'w') as f:
-            json.dump(api_res, f, indent=2)
-            logger.debug('Quedo tu archivo chavo')
+        # with open('ConfigurationList_new.json', 'w') as f:
+        #     json.dump(api_res, f, indent=2)
+            #logger.debug('Quedo tu archivo chavo')
         return api_res
-    
-    
-
