@@ -18,12 +18,10 @@ class Endpoints(object):
         otroNombre = {"username" : "TesterApi", "password" : "Aspen101"}
         
         response = self.requestUtility.post('/auth/LogIn', payload=otroNombre)
-        #logger.debug('Esto salio: '+str(response))
-        logger.debug(type(response))
-        logger.debug(response)
-        self.AccessToken = response['AccessToken']
+        logger.debug('Esto salio:')
+        logger.debug(response['AccessToken'])
+        self.requestUtility.accessToken = response['AccessToken']
         
-        self.requestUtility.AccessToken = self.AccessToken
 
         
     def get_DSList(self):

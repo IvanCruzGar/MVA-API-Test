@@ -9,7 +9,7 @@ API_HOSTS = {
     "API_B": "https://mvt-ins-c-d1.qae.aspentech.com/DataProvider/",
     "prod": "",
     "tsd":"http://172.22.4.151:8080/Aspentech/APM/",
-    "MVApp":"http://172.22.4.210:9001/AspenProcessPulse/api",
+    "MVApp":"http://172.22.4.62:9001/AspenProcessPulse/api",
 }
 
 DB_HOST = {

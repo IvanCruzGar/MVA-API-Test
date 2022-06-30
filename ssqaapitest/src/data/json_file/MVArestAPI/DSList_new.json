@@ -1,11 +1,21 @@
 [
   {
+    "Id": 3,
+    "RevisionId": 3,
+    "RevisionNumber": 1,
+    "Name": "testASCII",
+    "Type": "ASCII",
+    "Created": "2022-04-20T22:20:02.307",
+    "IsEnabled": true,
+    "IsApproved": true
+  },
+  {
     "Id": 2,
     "RevisionId": 2,
     "RevisionNumber": 1,
-    "Name": "otherACII",
-    "Type": "ASCII",
-    "Created": "2022-06-14T16:35:59.68",
+    "Name": "anotherZEISS",
+    "Type": "ZEISS",
+    "Created": "2022-04-20T19:44:19.11",
     "IsEnabled": true,
     "IsApproved": false
   },
@@ -13,9 +23,9 @@
     "Id": 1,
     "RevisionId": 1,
     "RevisionNumber": 1,
-    "Name": "testASCII",
-    "Type": "ASCII",
-    "Created": "2022-06-14T16:34:19.887",
+    "Name": "testZEISS",
+    "Type": "ZEISS",
+    "Created": "2022-04-20T19:43:12.25",
     "IsEnabled": true,
     "IsApproved": false
   }

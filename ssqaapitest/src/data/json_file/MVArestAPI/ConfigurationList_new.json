@@ -1,18 +1,26 @@
 [
   {
     "ConfigId": 1,
-    "ConfigName": "testConfig1",
+    "ConfigName": "testASCIIPCA",
     "RevisionNumber": 1,
     "MethodName": "PCA",
-    "CreatedDate": "2022-06-14T16:35:21.823",
+    "CreatedDate": "2022-04-20T22:21:03.473",
     "Status": "Stopped"
   },
   {
     "ConfigId": 2,
-    "ConfigName": "noModelConfig",
+    "ConfigName": "nomodelOne",
     "RevisionNumber": 1,
     "MethodName": "No Model",
-    "CreatedDate": "2022-06-14T16:37:32.28",
+    "CreatedDate": "2022-06-29T23:36:18.73",
+    "Status": ""
+  },
+  {
+    "ConfigId": 3,
+    "ConfigName": "OtherASCIIconfig",
+    "RevisionNumber": 1,
+    "MethodName": "PCA",
+    "CreatedDate": "2022-06-29T23:37:13.97",
     "Status": "Stopped"
   }
 ]

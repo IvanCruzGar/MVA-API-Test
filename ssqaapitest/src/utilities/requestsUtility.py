@@ -24,7 +24,7 @@ class RequestsUtility(object):
         self.env = os.environ.get('API_A', 'API_B') or os.environ.get('API_C')
         self.base_url = API_HOSTS['MVApp']
         self.bearerToken = bearerToken
-        self.AccessToken = accessToken
+        self.accessToken = accessToken
 
     def assert_status_code(self):
         assert self.status_code == self.expected_status_code, f"Bad Status code." \
@@ -69,14 +69,16 @@ class RequestsUtility(object):
         if self.bearerToken:
             headers['Authorization'] = 'Bearer ' + self.bearerToken
         
-        if self.AccessToken:
-            headers['AccessToken'] = self.AccessToken
+        if self.accessToken:
+            headers = {'AccessToken': self.accessToken}
         
         self.url = self.base_url + endpoint
         if type(payload) == dict:
             payload = json.dumps(payload)
         else:
             payload = str(payload)
+        logger.debug("Esto arroja mi buen")
+        logger.debug(self.accessToken)
         rs_api = requests.get(url=self.url, data=payload, params=params, headers=headers, verify=False)
         logger.debug('Mando esto' + str(rs_api))
         self.status_code = rs_api.status_code
