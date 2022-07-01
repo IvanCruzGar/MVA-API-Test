@@ -5,8 +5,8 @@ $pytest_A = "pytest -m mva_ProcessPulseV14 --csv Report1.csv --csv-columns marke
 
 
 #Executing the Python 3.7.8 version into the VM
-(Get-NetIPAddress -AddressFamily IPV4 -InterfaceAlias Ethernet).IPAddress
-(Get-Content .\hosts_config.py).Replace('REEMPLAZAR',) | Out-File .\hosts_config.py
+$ipv4=(Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias "Ethernet 3").IPAddress
+(Get-Content .\hosts_config.py).Replace('REEMPLAZAR',$ipv4) | Out-File .\hosts_config.py
 
 Start-Process "cmd.exe"  "/k $pytest_A"
 while (!(Test-Path "C:\p4\MVA-API-Test\Report1.csv")){ Start-Sleep 20}
