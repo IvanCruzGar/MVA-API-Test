@@ -22,7 +22,7 @@ class RequestsUtility(object):
 
         # print(f"El ambiente: {os.environ.get(envi)}")
         self.env = os.environ.get('API_A', 'API_B') or os.environ.get('API_C')
-        self.base_url = API_HOSTS['MVApp']
+        self.base_url = API_HOSTS['MVAAut']
         self.bearerToken = bearerToken
         self.accessToken = accessToken
 

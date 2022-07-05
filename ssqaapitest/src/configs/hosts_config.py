@@ -1,7 +1,7 @@
-#from ssqaapitest.src.utilities.credentialsUtility import CredentialsUtility
+from ssqaapitest.src.utilities.credentialsUtility import CredentialsUtility
 
-#get_ip = CredentialsUtility
-#current_ip = get_ip.get_local_ip()
+get_ip = CredentialsUtility
+current_ip = get_ip.get_local_ip()
 
 #172.22.4.80
 API_HOSTS = {
@@ -10,7 +10,7 @@ API_HOSTS = {
     "prod": "",
     "tsd":"http://172.22.4.151:8080/Aspentech/APM/",
     "MVApp":"http://172.22.4.62:9001/AspenProcessPulse/api",
-    "MVAAut":"http://REEMPLAZAR:9001/AspenProcessPulse/api",
+    "MVAAut":"http://"+current_ip+":9001/AspenProcessPulse/api",
 }
 
 DB_HOST = {
