@@ -80,6 +80,7 @@ class RequestsUtility(object):
       
         rs_api = requests.get(url=self.url, data=payload, params=params, headers=headers, verify=False)
         logger.debug(rs_api.headers)
+        logger.debug(rs_api)
         
         self.status_code = rs_api.status_code
         self.expected_status_code = expected_status_code

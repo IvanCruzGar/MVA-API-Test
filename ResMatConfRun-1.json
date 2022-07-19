@@ -1,0 +1,18 @@
+[
+  {
+    "Id": 1,
+    "Name": "Scores"
+  },
+  {
+    "Id": 4,
+    "Name": "HotellingsT2"
+  },
+  {
+    "Id": 5,
+    "Name": "Residuals"
+  },
+  {
+    "Id": 28,
+    "Name": "FResiduals"
+  }
+]

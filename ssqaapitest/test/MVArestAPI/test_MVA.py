@@ -46,7 +46,6 @@ class TestListElements(unittest.TestCase):
 
     @pytest.mark.vsts787828
     def test_MVAConfig(self):
-        
         logger.debug(self.id())
         endpoints = Endpoints()
         res = endpoints.get_ConfigurationList()
@@ -57,7 +56,6 @@ class TestListElements(unittest.TestCase):
         
     @pytest.mark.vsts787818
     def test_MVAConfR(self):
-        
         logger.debug(self.id())
         endpoints = Endpoints()
         res = endpoints.get_ConfRunList()

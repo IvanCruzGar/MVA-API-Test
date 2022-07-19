@@ -1,0 +1,30 @@
+{
+  "Metadata": {
+    "Title": "Intercept term computed",
+    "Significance level": "0.05",
+    "Validation method": "Leverage",
+    "Raw data used": "",
+    "   X": "",
+    "       Data Matrix used": "635950600450251168",
+    "       Name": "Columnset(3)",
+    "        Type": "Non Spectra data ",
+    "       Size": "9 samples, 226 variables",
+    "       Sample set": "1-9",
+    "       Variable set": "1-7",
+    "       Samples kept out": "",
+    "       Variables kept out": "",
+    "       Weights": "All1.00",
+    "   Y": "",
+    "       Data Matrix used ": "635950600450251168",
+    "       Name ": "635950600450251168",
+    "        Type ": "Non Spectra data ",
+    "       Size ": "9 samples, 226 variables",
+    "       Sample set ": "1-9",
+    "       Variable set ": "1-226",
+    "       Samples kept out ": "",
+    "       Variables kept out ": "",
+    "       Weights ": "All1.00",
+    "Created": "2022-07-05 17",
+    "Computation time": "00"
+  }
+}

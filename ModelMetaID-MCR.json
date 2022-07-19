@@ -1,0 +1,20 @@
+{
+  "Metadata": {
+    "Title": "* Non-negativity (Spectra). ",
+    "Optimal number of pure components": "2",
+    "Constraints applied": "",
+    "Sensitivity": "100",
+    "Maximum number of ALS iterations": "50",
+    "Raw data used": "",
+    "  Data Matrix used": "635950600450251168",
+    "  Name": "635950600450251168",
+    "   Type": "Non-spectra data ",
+    "  Size": "9 samples, 226 variables",
+    "  Sample set": "1-9",
+    "  Variable set": "1-226",
+    "  Samples kept out": "",
+    "  Variables kept out": "",
+    "Created": "2022-07-05 17",
+    "Computation time": "00"
+  }
+}

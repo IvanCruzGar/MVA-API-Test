@@ -15,11 +15,13 @@ class Endpoints(object):
         
         self.requestUtility = RequestsUtility()
         auth= "/auth/LogIn"
-        otroNombre = {"username" : "TesterApi", "password" : "Aspen101"}
+        otroNombre = {"username" : "API1", "password" : "Aspen100"}
         
         response = self.requestUtility.post('/auth/LogIn', payload=otroNombre)
-        # logger.debug('Esto salio:')
-        #logger.debug(response)
+        logger.debug('Esto salio:')
+        logger.debug(response)
+       
+        
         self.requestUtility.accessToken = response['AccessToken']
         
         
@@ -43,26 +45,26 @@ class Endpoints(object):
 
     def get_ModelList(self):
         api_res = self.requestUtility.get("/Model/List")
-        # with open('ModelList_header.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
-        # logger.debug(api_res)
+        with open('ModelList_header.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
+        logger.debug(api_res)
         return api_res
 
     def get_ConfigurationList(self):
         api_res = self.requestUtility.get("/Configuration/List")
-        # with open('ConfigurationList_header.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
-        # logger.debug(api_res)
+        with open('ConfigurationList_header.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
+        logger.debug(api_res)
         return api_res
 
     def get_ConfRunList(self):
         api_res = self.requestUtility.get("/Configuration/RunsList?ConfigurationId=1")
-        # with open('ConfRunsList.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
-        # logger.debug(api_res)
+        with open('ConfRunsList.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
+        logger.debug(api_res)
         return api_res
 
     def get_RawDataID(self):
@@ -87,11 +89,11 @@ class Endpoints(object):
         #logger.debug(api_res)
         return api_res
     def get_RModelMetaMRID(self):
-        api_res = self.requestUtility.get("/model/metadata?modelRevisionId=1")
-        # with open('ModelMetaID.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
-        #logger.debug(api_res)
+        api_res = self.requestUtility.get("/model/metadata?modelRevisionId=14")
+        with open('ModelMetaID.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
+        logger.debug(api_res)
         return api_res
     #
     def get_RRMNFull(self):
@@ -103,18 +105,19 @@ class Endpoints(object):
         return api_res
 
     def get_RRMConfRun(self):
-        api_res = self.requestUtility.get("/Configuration/ResultTypes?configurationRunId=2")
-        # with open('ResMatConfRun.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
-        # logger.debug(api_res)
+        api_res = self.requestUtility.get("/Configuration/ResultTypes?configurationRunId=14")
+        with open('ResMatConfRun.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
+        logger.debug(api_res)
         return api_res
+
     def get_RDSMetaDSId(self):
-        api_res = self.requestUtility.get("/datasource/metadata?datasourceRevisionId=1")
-        # with open('RDSMetaDSId.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
-        # logger.debug(api_res)
+        api_res = self.requestUtility.get("Configuration/GetConfigurationRunsByTags?TagKey=Tag1&TagValue=Testing")
+        with open('RCRbyMD.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
+        logger.debug(api_res)
         return api_res
 
     def get_RConfMetaConfId(self):
