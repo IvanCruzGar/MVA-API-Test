@@ -4,7 +4,7 @@ import requests
 import json
 
 from ssqaapitest.src.helpers.MVA_restAPI.requests import Endpoints
-from ssqaapitest.src.helpers.TSD_ConsumerService.dbConnection import dbConnection
+from ssqaapitest.src.helpers.MVA_restAPI.dbConnection import dbConnection
 from ssqaapitest.src.utilities.jsonUtility import JsonUtility
 import logging as logger
 
@@ -142,3 +142,20 @@ class TestListElements(unittest.TestCase):
         jsonUtil = JsonUtility('MVArestAPI')
         resExp = jsonUtil.read_Json('RConfMetaConfId.json')
         self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.prueba1
+    def test_pruebita(self):
+        
+        logger.debug(self.id())
+        dbConex = dbConnection()
+        params={'ApprovedRevisionId':3}
+        res = dbConex.get_DataSet()
+        logger.debug(res)
+        logger.debug(len(res))
+        logger.debug((res[0]['DataSourceID']))
+        endpoints = Endpoints()
+        resotro = endpoints.get_DSList()
+        logger.debug(res)
+        logger.debug(len(res))
+        logger.debug(type(res))
+        self.assertEqual(1, 1,"Something went wrong")
