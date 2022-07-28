@@ -143,6 +143,16 @@ class TestListElements(unittest.TestCase):
         resExp = jsonUtil.read_Json('RConfMetaConfId.json')
         self.assertEqual(res, resExp,"Something went wrong")
 
+    @pytest.mark.vsts788393
+    def test_RetrieveResultMatricesName(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameFullList()
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RConfMetaConfId.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
 
 
     @pytest.mark.prueba1

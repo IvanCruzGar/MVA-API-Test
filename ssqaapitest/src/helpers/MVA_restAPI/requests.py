@@ -127,3 +127,12 @@ class Endpoints(object):
         #     logger.debug('Quedo tu archivo chavo')
         #logger.debug(api_res)
         return api_res
+
+
+    def get_RRMatricesNameFullList(self):
+        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=1?MatrixName=Scores", expected_status_code = 200, resEmpty = True)
+        # with open('RConfMetaConfId.json', 'w') as f:
+        #     json.dump(api_res, f, indent=2)
+        #     logger.debug('Quedo tu archivo chavo')
+        #logger.debug(api_res)
+        return api_res
