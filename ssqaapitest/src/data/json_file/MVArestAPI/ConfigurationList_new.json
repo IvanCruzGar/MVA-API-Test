@@ -1,26 +1,122 @@
 [
   {
     "ConfigId": 1,
-    "ConfigName": "testASCIIPCA",
+    "ConfigName": "ASCII_PCA",
     "RevisionNumber": 1,
     "MethodName": "PCA",
-    "CreatedDate": "2022-04-20T22:21:03.473",
-    "Status": "Stopped"
+    "CreatedDate": "2022-06-28T21:35:01.847",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
   },
   {
     "ConfigId": 2,
-    "ConfigName": "nomodelOne",
+    "ConfigName": "SIMCA_PCA",
     "RevisionNumber": 1,
-    "MethodName": "No Model",
-    "CreatedDate": "2022-06-29T23:36:18.73",
-    "Status": ""
+    "MethodName": "SIMCA",
+    "CreatedDate": "2022-07-05T17:43:43.507",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
   },
   {
     "ConfigId": 3,
-    "ConfigName": "OtherASCIIconfig",
+    "ConfigName": "PCA_Fresid",
     "RevisionNumber": 1,
     "MethodName": "PCA",
-    "CreatedDate": "2022-06-29T23:37:13.97",
-    "Status": "Stopped"
+    "CreatedDate": "2022-07-05T18:27:44.067",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 4,
+    "ConfigName": "PCA_Qresid",
+    "RevisionNumber": 1,
+    "MethodName": "PCA",
+    "CreatedDate": "2022-07-05T18:28:45.44",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 5,
+    "ConfigName": "PCA_Sresid",
+    "RevisionNumber": 1,
+    "MethodName": "PCA",
+    "CreatedDate": "2022-07-05T18:29:31.99",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 6,
+    "ConfigName": "SVMR",
+    "RevisionNumber": 1,
+    "MethodName": "SVMR",
+    "CreatedDate": "2022-07-06T16:04:42.81",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 7,
+    "ConfigName": "MCR",
+    "RevisionNumber": 1,
+    "MethodName": "MCR",
+    "CreatedDate": "2022-07-06T16:20:29.253",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 8,
+    "ConfigName": "MLR",
+    "RevisionNumber": 1,
+    "MethodName": "MLR",
+    "CreatedDate": "2022-07-06T16:21:16.807",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 9,
+    "ConfigName": "PCR_Fresid",
+    "RevisionNumber": 1,
+    "MethodName": "Predict",
+    "CreatedDate": "2022-07-06T16:23:22.247",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 10,
+    "ConfigName": "PCR_Qresid",
+    "RevisionNumber": 1,
+    "MethodName": "Predict",
+    "CreatedDate": "2022-07-06T16:24:21.03",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 11,
+    "ConfigName": "Batch",
+    "RevisionNumber": 1,
+    "MethodName": "Batch",
+    "CreatedDate": "2022-07-06T16:30:08.177",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 12,
+    "ConfigName": "ConfigFases",
+    "RevisionNumber": 1,
+    "MethodName": "PCA",
+    "CreatedDate": "2022-07-27T13:54:14.07",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
   }
 ]

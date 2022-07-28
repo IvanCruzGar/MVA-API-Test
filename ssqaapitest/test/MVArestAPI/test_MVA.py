@@ -130,7 +130,7 @@ class TestListElements(unittest.TestCase):
         endpoints = Endpoints()
         res = endpoints.get_RDSMetaDSId()
         jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('RDSMetaDSId.json')
+        resExp = jsonUtil.read_Json('RDSMbyDSid.json')
         self.assertEqual(res, resExp,"Something went wrong")
 
     @pytest.mark.vsts788755
@@ -142,6 +142,8 @@ class TestListElements(unittest.TestCase):
         jsonUtil = JsonUtility('MVArestAPI')
         resExp = jsonUtil.read_Json('RConfMetaConfId.json')
         self.assertEqual(res, resExp,"Something went wrong")
+
+
 
     @pytest.mark.prueba1
     def test_pruebita(self):

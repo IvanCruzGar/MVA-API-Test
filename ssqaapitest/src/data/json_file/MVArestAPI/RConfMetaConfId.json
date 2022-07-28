@@ -1,10 +1,10 @@
 [
   {
     "Configuration ID": 1,
-    "Configuration Name": "testASCIIPCA",
+    "Configuration Name": "ASCII_PCA",
     "Revision Number": 1,
     "Method Name": "PCA",
-    "Model Name": "testPCA2",
+    "Model Name": "PCA_OQ",
     "Transformations": null,
     "Online Calculations": null,
     "Output": null,
