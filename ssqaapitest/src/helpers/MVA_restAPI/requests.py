@@ -53,18 +53,18 @@ class Endpoints(object):
 
     def get_ConfigurationList(self):
         api_res = self.requestUtility.get("/Configuration/List")
-        # with open('ConfigurationList_new.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
-        #logger.debug(api_res)
+        with open('ConfigurationList_new.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
+        logger.debug(api_res)
         return api_res
 
     def get_ConfRunList(self):
-        api_res = self.requestUtility.get("/Configuration/RunsList?ConfigurationId=1")
+        api_res = self.requestUtility.get("/Configuration/GetConfigurationRunsByTags?TagKey=Product&TagValue=Testing")
         # with open('ConfRunsList.json', 'w') as f:
         #     json.dump(api_res, f, indent=2)
         #     logger.debug('Quedo tu archivo chavo')
-        # logger.debug(api_res)
+        logger.debug(api_res)
         return api_res
 
     def get_RawDataID(self):
@@ -97,19 +97,19 @@ class Endpoints(object):
         return api_res
     #
     def get_RRMNFull(self):
-        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=2?MatrixName=HotellingsT2")
+        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=3?MatrixName=Scores")
         # with open('ResMatFull.json', 'w') as f:
         #     json.dump(api_res, f, indent=2)
         #     logger.debug('Quedo tu archivo chavo')
-        #logger.debug(api_res)
+        logger.debug(api_res)
         return api_res
 
     def get_RRMConfRun(self):
-        api_res = self.requestUtility.get("/Configuration/ResultTypes?configurationRunId=14")
-        # with open('ResMatConfRun.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
-        #logger.debug(api_res)
+        api_res = self.requestUtility.get("/Configuration/ResultTypes?configurationRunId=10")
+        with open('ResMatConfRun.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
+        logger.debug(api_res)
         return api_res
 
     def get_RDSMetaDSId(self):
@@ -122,10 +122,10 @@ class Endpoints(object):
 
     def get_RConfMetaConfId(self):
         api_res = self.requestUtility.get("/Configuration/Metadata?configurationRevisionId=1")
-        # with open('RConfMetaConfId.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('Quedo tu archivo chavo')
-        #logger.debug(api_res)
+        with open('RConfMetaConfId.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('Quedo tu archivo chavo')
+        logger.debug(api_res)
         return api_res
 
 

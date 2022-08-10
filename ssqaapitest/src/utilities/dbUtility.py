@@ -12,7 +12,7 @@ class DBUtility(object):
     def __init__(self):
         creds_helper = CredentialsUtility()
         #self.creds = creds_helper.get_user_credentials(ip='172.22.4.151', dbName= 'MtellReservoir04152022') #alpha1
-        self.creds = creds_helper.get_user_credentials(ip=creds_helper.get_local_ip(), dbName= 'AspenProcessPulse')
+        self.creds = creds_helper.get_user_credentials(ip=creds_helper.get_local_ip(), dbName= 'AspenProcessPulse_other')
 
     def create_connection(self):
         connection = pymssql.connect(server=self.creds['db_ip'], port=self.creds['db_port'], user=self.creds['db_user'],

@@ -7,8 +7,8 @@ class dbConnection(object):
     def __init__(self):
         self.db_helper = DBUtility()
 
-    def get_DataSet(self, dbParams = None):
-        sql = f'SELECT * FROM {self.db_helper.creds["db_database"]}.[dbo].[DataSource] '
+    def get_DataSet(self, dbParams = None, table = None):
+        sql = f'SELECT * FROM {self.db_helper.creds["db_database"]}.[dbo].['+ table +'] '
         sql += self.db_helper.add_condition_where(dbParams)
         return self.db_helper.execute_select(sql)
 

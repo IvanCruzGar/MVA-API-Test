@@ -33,8 +33,7 @@ class RequestsUtility(object):
                                                               f"URL:{self.url}, Response Json: {self.rs_json} "
 
     def post(self, endpoint, payload=None, params=None, headers=None, expected_status_code=200, resEmpty=False):
-        # if not headers:
-        #     headers = {"Content-Type": "application/json"}
+       
 
         if self.bearerToken:
             headers['Authorization'] = 'Bearer ' + self.bearerToken
@@ -57,14 +56,12 @@ class RequestsUtility(object):
         self.assert_status_code()
      
 
-        #logger.debug(f"POST API response: {self.status_code}")
-        #logger.debug(f"POST API response: {self.rs_json}")
+        
 
         return self.rs_json
 
     def get(self, endpoint, payload=None, params=None, headers=None, expected_status_code=200, resEmpty=False):
-        # if not headers:
-        #     headers = {"Content-Type": "application/json"}
+    
 
         if self.bearerToken:
             headers['Authorization'] = 'Bearer ' + self.bearerToken
@@ -79,8 +76,7 @@ class RequestsUtility(object):
             payload = str(payload)
       
         rs_api = requests.get(url=self.url, data=payload, params=params, headers=headers, verify=False)
-        logger.debug(rs_api.headers)
-        logger.debug(rs_api)
+        
         
         self.status_code = rs_api.status_code
         self.expected_status_code = expected_status_code
