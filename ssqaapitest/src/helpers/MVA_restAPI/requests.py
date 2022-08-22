@@ -54,7 +54,7 @@ class Endpoints(object):
         return api_res
 
     def get_ConfRunList(self):
-        api_res = self.requestUtility.get("/Configuration/GetConfigurationRunMetadataByRunID?runID=24")
+        api_res = self.requestUtility.get("/Configuration/GetConfigurationRunMetadataByRunID?runID=31")
         with open('ConfRunsList.json', 'w') as f:
             json.dump(api_res, f, indent=2)
             logger.debug('File Created')

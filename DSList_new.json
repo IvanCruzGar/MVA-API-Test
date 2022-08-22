@@ -1,0 +1,112 @@
+[
+  {
+    "Id": 11,
+    "RevisionId": 11,
+    "RevisionNumber": 1,
+    "Name": "pruebaFases",
+    "Type": "ASCII",
+    "Created": "2022-07-27T13:53:02.623",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 10,
+    "RevisionId": 10,
+    "RevisionNumber": 1,
+    "Name": "Batch",
+    "Type": "ASCII",
+    "Created": "2022-07-06T16:29:08.24",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 9,
+    "RevisionId": 9,
+    "RevisionNumber": 1,
+    "Name": "Eigen",
+    "Type": "GRAMS",
+    "Created": "2022-06-28T21:30:12.98",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 8,
+    "RevisionId": 8,
+    "RevisionNumber": 1,
+    "Name": "PI",
+    "Type": "PI",
+    "Created": "2022-06-28T21:20:54.42",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 7,
+    "RevisionId": 7,
+    "RevisionNumber": 1,
+    "Name": "Empower",
+    "Type": "Empower",
+    "Created": "2022-06-28T17:35:11.347",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 6,
+    "RevisionId": 6,
+    "RevisionNumber": 1,
+    "Name": "Image",
+    "Type": "Image",
+    "Created": "2022-06-28T17:33:44.25",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 5,
+    "RevisionId": 5,
+    "RevisionNumber": 1,
+    "Name": "ZEISS",
+    "Type": "ZEISS",
+    "Created": "2022-06-28T17:30:34.453",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 4,
+    "RevisionId": 4,
+    "RevisionNumber": 1,
+    "Name": "OPUS",
+    "Type": "OPUS",
+    "Created": "2022-06-28T17:28:58.533",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 3,
+    "RevisionId": 3,
+    "RevisionNumber": 1,
+    "Name": "JCAMP-DX",
+    "Type": "JCAMP-DX",
+    "Created": "2022-06-28T17:28:06.733",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 2,
+    "RevisionId": 2,
+    "RevisionNumber": 1,
+    "Name": "GRAMS",
+    "Type": "GRAMS",
+    "Created": "2022-06-28T17:23:06.27",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "Id": 1,
+    "RevisionId": 1,
+    "RevisionNumber": 1,
+    "Name": "ASCII",
+    "Type": "ASCII",
+    "Created": "2022-06-28T17:22:11.743",
+    "IsEnabled": true,
+    "IsApproved": false
+  }
+]

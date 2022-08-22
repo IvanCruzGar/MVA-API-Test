@@ -221,18 +221,6 @@ class TestListElements(unittest.TestCase):
 
 
 
-
-    @pytest.mark.vsts788346
-    def test_MVARawDataFNR(self):
-        
-        logger.debug(self.id())
-        endpoints = Endpoints()
-        res = endpoints.get_RawDataFNR()
-        jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('RawDataFNR.json')
-        self.assertEqual(res, resExp,"Something went wrong")
-
-
     @pytest.mark.vsts792456
     def test_RetrieveModelMetadatabyModelRevisionID_Batch(self):
 
@@ -473,38 +461,7 @@ class TestListElements(unittest.TestCase):
 
 
 
-    @pytest.mark.vsts788393
-    def test_MVARRMNFull(self):
-        
-        logger.debug(self.id())
-        endpoints = Endpoints()
-        res = endpoints.get_RRMNFull()
-        jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('ResMatFull.json')
-        self.assertEqual(res, resExp,"Something went wrong")
-
-    @pytest.mark.vsts788391
-    def test_MVARRMConfRun(self):
-        
-        logger.debug(self.id())
-        endpoints = Endpoints()
-        res = endpoints.get_RRMConfRun()
-        jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('ResMatConfRun.json')
-        self.assertEqual(res, resExp,"Something went wrong")
-
     
-
-    @pytest.mark.vsts788393
-    def test_RetrieveResultMatricesName(self):
-        
-        logger.debug(self.id())
-        endpoints = Endpoints()
-        res = endpoints.get_RRMatricesNameFullList()
-        jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('RConfMetaConfId.json')
-        self.assertEqual(res, resExp,"Something went wrong")
-
 
 
     @pytest.mark.prueba1
