@@ -1,0 +1,82 @@
+[
+  {
+    "Label": "Variables count",
+    "Value": "226"
+  },
+  {
+    "Label": "Timestamp variables",
+    "Value": "ID_NA"
+  },
+  {
+    "Label": "Non-numeric variables",
+    "Value": "ID_NA"
+  },
+  {
+    "Label": "Numeric variables",
+    "Value": "This is column 1, This is column 2, This is column 3, This is column 4, This is column 5, This is column 6, This is column 7, This is column 8, This is column 9, This is column 10, This is column 11, This is column 12, This is column 13, This is column 14, This is column 15, This is column 16, This is column 17, This is column 18, This is column 19, This is column 20, This is column 21, This is column 22, This is column 23, This is column 24, This is column 25, This is column 26, This is column 27, This is column 28, This is column 29, This is column 30, This is column 31, This is column 32, This is column 33, This is column 34, This is column 35, This is column 36, This is column 37, This is column 38, This is column 39, This is column 40, This is column 41, This is column 42, This is column 43, This is column 44, This is column 45, This is column 46, This is column 47, This is column 48, This is column 49, This is column 50, This is column 51, This is column 52, This is column 53, This is column 54, This is column 55, This is column 56, This is column 57, This is column 58, This is column 59, This is column 60, This is column 61, This is column 62, This is column 63, This is column 64, This is column 65, This is column 66, This is column 67, This is column 68, This is column 69, This is column 70, This is column 71, This is column 72, This is column 73, This is column 74, This is column 75, This is column 76, This is column 77, This is column 78, This is column 79, This is column 80, This is column 81, This is column 82, This is column 83, This is column 84, This is column 85, This is column 86, This is column 87, This is column 88, This is column 89, This is column 90, This is column 91, This is column 92, This is column 93, This is column 94, This is column 95, This is column 96, This is column 97, This is column 98, This is column 99, This is column 100, This is column 101, This is column 102, This is column 103, This is column 104, This is column 105, This is column 106, This is column 107, This is column 108, This is column 109, This is column 110, This is column 111, This is column 112, This is column 113, This is column 114, This is column 115, This is column 116, This is column 117, This is column 118, This is column 119, This is column 120, This is column 121, This is column 122, This is column 123, This is column 124, This is column 125, This is column 126, This is column 127, This is column 128, This is column 129, This is column 130, This is column 131, This is column 132, This is column 133, This is column 134, This is column 135, This is column 136, This is column 137, This is column 138, This is column 139, This is column 140, This is column 141, This is column 142, This is column 143, This is column 144, This is column 145, This is column 146, This is column 147, This is column 148, This is column 149, This is column 150, This is column 151, This is column 152, This is column 153, This is column 154, This is column 155, This is column 156, This is column 157, This is column 158, This is column 159, This is column 160, This is column 161, This is column 162, This is column 163, This is column 164, This is column 165, This is column 166, This is column 167, This is column 168, This is column 169, This is column 170, This is column 171, This is column 172, This is column 173, This is column 174, This is column 175, This is column 176, This is column 177, This is column 178, This is column 179, This is column 180, This is column 181, This is column 182, This is column 183, This is column 184, This is column 185, This is column 186, This is column 187, This is column 188, This is column 189, This is column 190, This is column 191, This is column 192, This is column 193, This is column 194, This is column 195, This is column 196, This is column 197, This is column 198, This is column 199, This is column 200, This is column 201, This is column 202, This is column 203, This is column 204, This is column 205, This is column 206, This is column 207, This is column 208, This is column 209, This is column 210, This is column 211, This is column 212, This is column 213, This is column 214, This is column 215, This is column 216, This is column 217, This is column 218, This is column 219, This is column 220, This is column 221, This is column 222, This is column 223, This is column 224, This is column 225, This is column 226"
+  },
+  {
+    "Label": "Watch folder",
+    "Value": "C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\ASCII\\Watch"
+  },
+  {
+    "Label": "Example file:",
+    "Value": "C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\ASCII\\Input\\635950600420199449.txt"
+  },
+  {
+    "Label": "Use timestamp from file",
+    "Value": "False"
+  },
+  {
+    "Label": "Restore strategy",
+    "Value": "None"
+  },
+  {
+    "Label": "Spectra Direction",
+    "Value": "ID_READING_DIRECTION_LEFT_RIGHT"
+  },
+  {
+    "Label": "Use first column as sample information",
+    "Value": "True"
+  },
+  {
+    "Label": "Use first row as header",
+    "Value": "True"
+  },
+  {
+    "Label": "Skip rows",
+    "Value": "0"
+  },
+  {
+    "Label": "Skip cols",
+    "Value": "0"
+  },
+  {
+    "Label": "Treat multiple-line file as one sample",
+    "Value": "False"
+  },
+  {
+    "Label": "Separator",
+    "Value": ";"
+  },
+  {
+    "Label": "Decimal Separator",
+    "Value": ","
+  },
+  {
+    "Label": "Process double quotes",
+    "Value": "True"
+  },
+  {
+    "Label": "Treat consecutive separators as one",
+    "Value": "False"
+  },
+  {
+    "Label": "Transpose data",
+    "Value": "False"
+  },
+  {
+    "Label": "Date/Time format:",
+    "Value": "yyyy-MM-dd HH:mm:ss"
+  }
+]

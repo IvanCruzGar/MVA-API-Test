@@ -1,0 +1,46 @@
+[
+  {
+    "Label": "Variables count",
+    "Value": "0"
+  },
+  {
+    "Label": "Timestamp variables",
+    "Value": "ID_NA"
+  },
+  {
+    "Label": "Non-numeric variables",
+    "Value": "ID_NA"
+  },
+  {
+    "Label": "Numeric variables",
+    "Value": "ID_NA"
+  },
+  {
+    "Label": "Watch folder",
+    "Value": "C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\Image\\Watch"
+  },
+  {
+    "Label": "Example file:",
+    "Value": "C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\Image\\Input\\1.JPG"
+  },
+  {
+    "Label": "Use timestamp from file",
+    "Value": "False"
+  },
+  {
+    "Label": "Restore strategy",
+    "Value": "None"
+  },
+  {
+    "Label": "Spectra Direction",
+    "Value": "ID_READING_DIRECTION_LEFT_RIGHT"
+  },
+  {
+    "Label": "Polling",
+    "Value": "True"
+  },
+  {
+    "Label": "Polling period",
+    "Value": "5 ID_SECONDS"
+  }
+]

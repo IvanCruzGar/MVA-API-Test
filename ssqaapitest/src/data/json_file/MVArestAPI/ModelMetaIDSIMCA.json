@@ -1,0 +1,19 @@
+{
+  "Metadata": {
+    "Title": "SIMCA classification",
+    "Models used": "",
+    "PCR_FResiduals": "",
+    "       Components used": "1",
+    "       Suggested": "1",
+    "       Max PC/LVs": "7",
+    "Raw data used": "",
+    "X": "",
+    "       Data Matrix used": "X",
+    "       Name": "635950600450251168",
+    "       Size": "9 samples, 226 variables",
+    "       Sample set": "1-9",
+    "       Variable set": "1-226",
+    "Created": "2022-07-05 16",
+    "Computation time": "00"
+  }
+}

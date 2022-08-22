@@ -1,0 +1,34 @@
+[
+  {
+    "Label": "Variables count",
+    "Value": "1154"
+  },
+  {
+    "Label": "First X",
+    "Value": "12489.578125"
+  },
+  {
+    "Label": "Last X",
+    "Value": "3594.90014648438"
+  },
+  {
+    "Label": "Watch folder",
+    "Value": "C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\OPUS\\Watch"
+  },
+  {
+    "Label": "Example file:",
+    "Value": "C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\OPUS\\Input\\3310940016_9-1.0"
+  },
+  {
+    "Label": "Use timestamp from file",
+    "Value": "False"
+  },
+  {
+    "Label": "Restore strategy",
+    "Value": "None"
+  },
+  {
+    "Label": "Spectra Direction",
+    "Value": "ID_READING_DIRECTION_LEFT_RIGHT"
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "Label": "Variables count",
+    "Value": "4"
+  },
+  {
+    "Label": "Timestamp variables",
+    "Value": "ID_NA"
+  },
+  {
+    "Label": "Non-numeric variables",
+    "Value": "ID_NA"
+  },
+  {
+    "Label": "Numeric variables",
+    "Value": "BatchID, Druck, Temp A, Temp B"
+  },
+  {
+    "Label": "Watch folder",
+    "Value": "C:\\Users\\CONTRERA\\Documents\\Files\\ASCII UC620203  b3_comma"
+  },
+  {
+    "Label": "Example file:",
+    "Value": "C:\\Users\\CONTRERA\\Documents\\Files\\ASCII UC620203  b3_comma\\Bob 6 Batches_b3_comma.txt"
+  },
+  {
+    "Label": "Use timestamp from file",
+    "Value": "False"
+  },
+  {
+    "Label": "Restore strategy",
+    "Value": "None"
+  },
+  {
+    "Label": "Spectra Direction",
+    "Value": "ID_READING_DIRECTION_LEFT_RIGHT"
+  },
+  {
+    "Label": "Use first column as sample information",
+    "Value": "True"
+  },
+  {
+    "Label": "Use first row as header",
+    "Value": "True"
+  },
+  {
+    "Label": "Skip rows",
+    "Value": "0"
+  },
+  {
+    "Label": "Skip cols",
+    "Value": "0"
+  },
+  {
+    "Label": "Treat multiple-line file as one sample",
+    "Value": "False"
+  },
+  {
+    "Label": "Separator",
+    "Value": ","
+  },
+  {
+    "Label": "Decimal Separator",
+    "Value": "."
+  },
+  {
+    "Label": "Process double quotes",
+    "Value": "True"
+  },
+  {
+    "Label": "Treat consecutive separators as one",
+    "Value": "False"
+  },
+  {
+    "Label": "Transpose data",
+    "Value": "False"
+  },
+  {
+    "Label": "Date/Time format:",
+    "Value": "yyyy-MM-dd HH:mm:ss"
+  }
+]
