@@ -537,19 +537,7 @@ class TestListElements(unittest.TestCase):
         #Check COnfiguration Name
         ####################################################AQUI me quede###########################################################################
 
-        self.assertEqual((resDB2[ConfID-1]['name']),(resAPI[0]['Configuration Name']),"Name was different")
-        #MethodName
-        Meth=resDB[ConfID-1]['MethodInfo']
-        # logger.debug(Meth[Meth.find('<name>')+6:Meth.find('</name>')])
-        # logger.debug(resAPI[0]['Method Name'])
-        self.assertEqual((Meth[Meth.find('<name>')+6:Meth.find('</name>')]),(resAPI[0]['Method Name']),"Method is different")
-        #ModelName
-        Mod=resDB[ConfID-1]['ConfigurationInfo']
-        logger.debug(Mod[Mod.find('<name>')+6:Mod.find('</name>')])
-        logger.debug(Meth)
-        
-        logger.debug(resAPI[0]['Model Name'])
-        self.assertEqual((Mod[Mod.find('<name>')+6:Mod.find('</name>')]),(resAPI[0]['Model Name']),"Method is different")
+
 
 
     @pytest.mark.vsts800106
