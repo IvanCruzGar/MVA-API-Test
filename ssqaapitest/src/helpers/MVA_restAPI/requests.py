@@ -96,7 +96,7 @@ class Endpoints(object):
         with open('RawDataID.json', 'w') as f:
             json.dump(api_res, f, indent=2)
             logger.debug('File Created')
-        #logger.debug(api_res)
+        logger.debug(api_res)
         return api_res
     
     def get_RDIDOffset(self, RevID=1,Off=1,Rows=1):
@@ -107,21 +107,7 @@ class Endpoints(object):
         #logger.debug(api_res)
         return api_res
 
-    def get_RawDataFNR(self):
-        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId=1&FirstNRows=5")
-        # with open('RawDataFNR.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('File Created')
-        #logger.debug(api_res)
-        return api_res
-    def get_RawDataOFF(self):
-        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId=1&Offset=5&Rows=5")
-        # with open('RawDataOFF.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('File Created')
-        #logger.debug(api_res)
-        return api_res
-
+    
     def get_RModelMetaMRID(self,RevID=1,expRes=200,empRes=False):
         api_res = self.requestUtility.get("/model/metadata?modelRevisionId="+str(RevID),expected_status_code=expRes,resEmpty = empRes)
         with open('ModelMetaID.json', 'w') as f:
@@ -145,6 +131,26 @@ class Endpoints(object):
             logger.debug('File Created')
         logger.debug(api_res)
         return api_res
+    
+    def get_RetMetaInfoConfRuns(self,RevID=1,expRes=200,empRes=False):
+        api_res = self.requestUtility.get("/Configuration/GetConfigurationRunMetadataByRunID?runID="+str(RevID),expected_status_code=expRes,resEmpty=empRes)
+        with open('MetaInfoConfigRun.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
+
+    
+
+
+    def get_ConfigTags(self):
+        api_res = self.requestUtility.get("/configuration/GetTagInformation?label=")
+        with open('ConfigTagsRetrieve.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
+
 
     def get_RRMNFull(self):
         api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=3?MatrixName=Scores")
@@ -161,10 +167,6 @@ class Endpoints(object):
             logger.debug('File Created')
         logger.debug(api_res)
         return api_res
-
-
-    
-
 
     def get_RRMatricesNameFullList(self):
         api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=1?MatrixName=Scores", expected_status_code = 200, resEmpty = True)

@@ -138,5 +138,25 @@
     "Status": "Stopped",
     "IsEnabled": true,
     "IsApproved": false
+  },
+  {
+    "ConfigId": 12,
+    "ConfigName": "ConfigFases",
+    "RevisionNumber": 2,
+    "MethodName": "PCA",
+    "CreatedDate": "2022-08-22T20:54:16.05",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 12,
+    "ConfigName": "ConfigFases",
+    "RevisionNumber": 3,
+    "MethodName": "PCA",
+    "CreatedDate": "2022-08-22T20:58:30.357",
+    "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
   }
 ]

@@ -18,7 +18,7 @@ import random
 class TestListElements(unittest.TestCase):
 
    
-
+    #Use Case 689747: 7. Retrieve List of Data Sources
     @pytest.mark.vsts787805
     def test_RetrieveListOfDataSources(self):
         
@@ -64,6 +64,7 @@ class TestListElements(unittest.TestCase):
         logger.debug(resAPI[-aleat]['IsEnabled']) """
         self.assertFalse(bool(resDB2[aleat-1]['Disabled']),resAPI[-aleat]['IsEnabled'])
 
+    #Use Case 689756: 14. Retrieve list of Models
     @pytest.mark.vsts787828
     def test_RetrieveListOfModels(self):
         
@@ -114,6 +115,7 @@ class TestListElements(unittest.TestCase):
         logger.debug(resAPI[aleat-1]['UploadedBy']) """
         self.assertEqual((resDB[aleat-1]['UploadedBy']),resAPI[aleat-1]['UploadedBy'])
         
+    #Use Case 689749: 8. Retrieve list of Configurations
     @pytest.mark.vsts787809
     def test_RetrieveListOfConfigurations(self):
         logger.debug(self.id())
@@ -131,7 +133,7 @@ class TestListElements(unittest.TestCase):
         #Check structure information in the RestAPI response 
         info=list(resAPI[0].keys())
         #logger.debug(info)
-        structure= ['ConfigId', 'ConfigName', 'RevisionNumber', 'MethodName', 'CreatedDate', 'Status', 'IsEnabled', 'IsApproved']
+        structure= ['ConfigId', 'ConfigName', 'RevisionNumber', 'ModeldName', 'CreatedDate', 'Status', 'IsEnabled', 'IsApproved']
         self.assertEqual(info, structure,"Something went wrong")
 
         #Check information of a random Configuration
@@ -160,6 +162,7 @@ class TestListElements(unittest.TestCase):
         self.assertFalse(bool(resDB2[aleat-1]['disabled']),resAPI[aleat-1]['IsEnabled'])
         logger.debug((resDB[aleat-1]['MethodInfo']))
 
+    #Use Case 689750: 9. Retrieve list of Configuration Runs
     @pytest.mark.vsts787818
     def test_RetrieveListOfConfigurationRuns(self):
         logger.debug(self.id())
@@ -169,6 +172,7 @@ class TestListElements(unittest.TestCase):
         resExp = jsonUtil.read_Json('ConfRunsList.json')
         self.assertEqual(res, resExp,"Something went wrong")
 
+    #Use Case 763821: Return Codes
     @pytest.mark.vsts790591
     def test_ReturnCode404(self):
         logger.debug(self.id())
@@ -196,15 +200,15 @@ class TestListElements(unittest.TestCase):
         endpoints = Endpoints()
         res = endpoints.get_code401WrongToken()
         self.assertEqual(res,res)
-        
     
-
+    
+    #Use Case 689751: 10. Retrieve Raw Data
     @pytest.mark.vsts788343
     def test_RetrieveRawData_ConfigurationRunID(self):
         
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_RawDataID(RevID=1)
+        res = endpoints.get_RawDataID(RevID=2)
         jsonUtil = JsonUtility('MVArestAPI')
         resExp = jsonUtil.read_Json('RawDataID.json')
         self.assertEqual(res, resExp,"Something went wrong")
@@ -219,8 +223,16 @@ class TestListElements(unittest.TestCase):
         resExp = jsonUtil.read_Json('RawDataIDOffset.json')
         self.assertEqual(res, resExp,"Something went wrong")
 
+    #Use Case 782953: Raw Data includes CDM values
 
 
+    #Use Case 689753: 12. Retrieve Result Matrices for Configuration Run
+
+    #Use Case 689754: 13. Retrieve Result Matrices by Name
+
+
+
+    #Use Case 764933: 14.2. Retrieve Model Metadata by Model Revision Id
     @pytest.mark.vsts792456
     def test_RetrieveModelMetadatabyModelRevisionID_Batch(self):
 
@@ -303,6 +315,7 @@ class TestListElements(unittest.TestCase):
         resExp = jsonUtil.read_Json('ModelMetaID.json')
         self.assertEqual(res, res,"Something went wrong")
 
+    #Use Case 764946: 7.2 Retrieve Data Source Metadata by Data Source Revision ID
     @pytest.mark.vsts788736
     def test_RetrieveDataSourceMetadatabyDataSourceRevisionID_ASCII(self):
         
@@ -423,6 +436,7 @@ class TestListElements(unittest.TestCase):
         resExp = jsonUtil.read_Json('RDSMbyDSidBatch.json')
         self.assertEqual(res, resExp,"Something went wrong") 
 
+    #Use Case 764949: 8.2 Retrieve Configuration Metadata by Revision ID
     @pytest.mark.vsts788755
     def test_RetrieveConfigurationMetadatabyRevisionID(self):
         
@@ -442,21 +456,118 @@ class TestListElements(unittest.TestCase):
         #self.assertEqual(info, structure,"Structure is different")
 
         #Check Configuration ID
-        logger.debug(resDB[ConfID-1]['ConfigurationID'])
-        logger.debug(resAPI[0]['Configuration ID'])
+        # logger.debug(resDB[ConfID-1]['ConfigurationID'])
+        # logger.debug(resAPI[0]['Configuration ID'])
         self.assertEqual((resDB[ConfID-1]['ConfigurationID']),(resAPI[0]['Configuration ID']),"Configuration ID was different")
         #Check Revision ID
-        logger.debug(resDB[ConfID-1]['RevisionID'])
-        logger.debug(resAPI[0]['Revision Number'])
+        # logger.debug(resDB[ConfID-1]['RevisionID'])
+        # logger.debug(resAPI[0]['Revision Number'])
         self.assertEqual((resDB[ConfID-1]['RevisionID']),(resAPI[0]['Revision Number']),"Revision was different")
         #Check COnfiguration Name
-        logger.debug(resDB2[ConfID-1]['name'])
-        logger.debug(resAPI[0]['Configuration Name'])
+        # logger.debug(resDB2[ConfID-1]['name'])
+        # logger.debug(resAPI[0]['Configuration Name'])
         self.assertEqual((resDB2[ConfID-1]['name']),(resAPI[0]['Configuration Name']),"Name was different")
+        #MethodName
+        Meth=resDB[ConfID-1]['MethodInfo']
+        # logger.debug(Meth[Meth.find('<name>')+6:Meth.find('</name>')])
+        # logger.debug(resAPI[0]['Method Name'])
+        self.assertEqual((Meth[Meth.find('<name>')+6:Meth.find('</name>')]),(resAPI[0]['Method Name']),"Method is different")
+        #ModelName
+        Mod=resDB[ConfID-1]['ConfigurationInfo']
+        logger.debug(Mod[Mod.find('<name>')+6:Mod.find('</name>')])
+        logger.debug(Meth)
+        
+        logger.debug(resAPI[0]['Model Name'])
+        self.assertEqual((Mod[Mod.find('<name>')+6:Mod.find('</name>')]),(resAPI[0]['Model Name']),"Method is different")
+    
+    @pytest.mark.vsts792457
+    def test_RetrieveConfigurationMetadatabyRevisionID_InvalidRevisionID(self):
+    
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        resAPI = endpoints.get_RConfMetaConfId(RevID=0,expRes=400,empRes=True)
+        self.assertEqual(resAPI,resAPI)
+
+    @pytest.mark.vsts792458
+    def test_RetrieveConfigurationMetadatabyRevisionID_NonExistingRevisionID(self):
+    
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        resAPI = endpoints.get_RConfMetaConfId(RevID=200,expRes=204,empRes=True)
+        self.assertEqual(resAPI,resAPI)
+    
+    
+    #Use Case 689752: 11. Retrieve Meta Information for Configuration Runs
+    @pytest.mark.vsts800098
+    def test_RetrieveMetaInformationforConfigurationRuns(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        #Get API response and information from DataBase
+        CRID=31
+        resAPI = endpoints.get_RetMetaInfoConfRuns(RevID=CRID)
+        dbConex = dbConnection()
+        resDB = dbConex.get_DataSet(table = 'DataMaster')
         
 
+        #Check API response structure
+        info=list(resAPI.keys())
+        logger.debug(info)
+        structure= ['BasicInfo', 'FlagInfo', 'CommentInfo', 'NotificationInfo']
+        self.assertEqual(info, structure,"Structure is different")
+
+        #Check Basic Info structure
+        info=list(resAPI['BasicInfo'].keys())
+        logger.debug(info)
+        structure= ['RunID', 'ConfigurationID', 'Name', 'RevisionID', 'StartTime', 'StopTime']
+        self.assertEqual(info, structure,"Structure of the Basic Info is different")
+
+        #Check Revision ID
+        logger.debug(resDB[CRID-1]['rev_id'])
+        RevID=resAPI['BasicInfo']['RevisionID']
+        logger.debug(RevID)
+        self.assertEqual((resDB[CRID-1]['rev_id']),(RevID),"Revision ID was different")
+        #Check Configuration ID
+        Parametros = {"RevisionID":RevID}
+        resDB2 = dbConex.get_DataSet(table = 'ConfigurationRevision',dbParams=Parametros)
+        logger.debug(resDB2[0]['ConfigurationID'])
+        ConfigID=resAPI['BasicInfo']['ConfigurationID']
+        logger.debug(ConfigID)
+        self.assertEqual((ConfigID),(resDB2[0]['ConfigurationID']),"Configuration ID was different")
+        #Check COnfiguration Name
+        ####################################################AQUI me quede###########################################################################
+
+        self.assertEqual((resDB2[ConfID-1]['name']),(resAPI[0]['Configuration Name']),"Name was different")
+        #MethodName
+        Meth=resDB[ConfID-1]['MethodInfo']
+        # logger.debug(Meth[Meth.find('<name>')+6:Meth.find('</name>')])
+        # logger.debug(resAPI[0]['Method Name'])
+        self.assertEqual((Meth[Meth.find('<name>')+6:Meth.find('</name>')]),(resAPI[0]['Method Name']),"Method is different")
+        #ModelName
+        Mod=resDB[ConfID-1]['ConfigurationInfo']
+        logger.debug(Mod[Mod.find('<name>')+6:Mod.find('</name>')])
+        logger.debug(Meth)
+        
+        logger.debug(resAPI[0]['Model Name'])
+        self.assertEqual((Mod[Mod.find('<name>')+6:Mod.find('</name>')]),(resAPI[0]['Model Name']),"Method is different")
 
 
+    @pytest.mark.vsts800106
+    def test_RetrievMetaInformationforConfigurationRuns_NonExistingConfigurationRun(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RConfMetaConfId(RevID=200, expRes=204, empRes=True)
+        self.assertEqual(res, res,"Something went wrong") 
+
+    @pytest.mark.vsts800107
+    def test_RetrievMetaInformationforConfigurationRuns_InvalidConfigurationRun(self):
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RConfMetaConfId(RevID=0, expRes=400, empRes=True)
+        self.assertEqual(res, res,"Something went wrong")  
+
+    #Use Case 783305: Retrieve configuration runs by metadata tag
 
 
 
@@ -464,56 +575,28 @@ class TestListElements(unittest.TestCase):
     
 
 
-    @pytest.mark.prueba1
-    def test_pruebita(self):
+    
+        
+    @pytest.mark.vsts793895
+    def test_RetrieveListOfTags(self):
         
         logger.debug(self.id())
 
         #Get information from DataBase and RestAPI
         dbConex = dbConnection()
-        resDB = dbConex.get_DataSet(table = 'ModelRevision')
-        resDB2 = dbConex.get_DataSet(table = 'Model')
+        varTagType = {"Type":1}
+        resDB = dbConex.get_DataSet(table = 'Tag',dbParams = varTagType)
+        
+        logger.debug(resDB)
         endpoints = Endpoints()
-        resAPI = endpoints.get_ModelList()
+        resAPI = endpoints.get_ConfigTags()
 
         #Check both have the same number of Data Sources
         self.assertEqual(len(resDB),len(resAPI))
         
         #Check structure information in the RestAPI response 
-        info=list(resAPI[0].keys())
-        logger.debug(info)
-        structure= ['ModelId', 'RevisionID', 'Name', 'Revision', 'ModelSoftware', 'ModelType', 'UploadedBy', 'UploadedDate', 'IsApproved', 'IsEnabled']
-        self.assertEqual(info, structure,"Something went wrong")
-
-        #Check information of a random Model
-        aleat= random.randint(1, 11)
-        logger.debug(aleat)
-        #ModelID
-        """ 
-        logger.debug((resDB[aleat-1]['DataSourceID']))
-        logger.debug(resAPI[-aleat]['Id']) """
-        self.assertEqual((resDB[aleat-1]['ModelID']),(resAPI[aleat-1]['ModelId']))
-        #RevisionID
-        """ logger.debug((resDB[aleat-1]['RevisionID']))
-        logger.debug(resAPI[-aleat]['RevisionId']) """
-        self.assertEqual((resDB[aleat-1]['RevisionID']),(resAPI[aleat-1]['RevisionID']),'Revision')
-        #Name
-        """ logger.debug((resDB2[aleat-1]['Name']))
-        logger.debug(resAPI[aleat-1]['Name']) """
-        self.assertEqual((resDB2[aleat-1]['Name']),(resAPI[aleat-1]['Name']))
-        #Created
-        """ logger.debug(str(resDB[aleat-1]['UploadDate'])[0:22])
-        logger.debug(resAPI[-aleat]['UploadedDate'][0:10]+' '+resAPI[aleat-1]['UploadedDate'][11:22]) """
-        self.assertEqual(str(resDB[aleat-1]['UploadDate'])[0:22],(resAPI[aleat-1]['UploadedDate'][0:10]+' '+resAPI[aleat-1]['UploadedDate'][11:22]))
-        #IsEnabled
-        """ logger.debug(bool(resDB2[aleat-1]['Disabled']))
-        logger.debug(resAPI[-aleat]['IsEnabled']) """
-        self.assertFalse(bool(resDB2[aleat-1]['Disabled']),resAPI[aleat-1]['IsEnabled'])
-        #IsEnabled
-        logger.debug((resDB[aleat-1]['UploadedBy']))
-        logger.debug(resAPI[aleat-1]['UploadedBy'])
-        self.assertEqual((resDB[aleat-1]['UploadedBy']),resAPI[aleat-1]['UploadedBy'])
-        
-        
-        
+        for i in resDB:
+            logger.debug(i["Label"])
+            self.assertIn(i["Label"],resAPI,"Tag "+i["Label"]+" was not found")
+              
         

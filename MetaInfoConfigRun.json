@@ -1,0 +1,148 @@
+{
+  "BasicInfo": {
+    "RunID": 31,
+    "ConfigurationID": 12,
+    "Name": "ConfigFases",
+    "RevisionID": 16,
+    "StartTime": "2022-08-22T21:14:09.8540549Z",
+    "StopTime": "2022-08-22T21:16:24.2616408Z"
+  },
+  "FlagInfo": [
+    {
+      "Flag": "Configuration started",
+      "CreatedDate": "2022-08-22T21:14:35.0366667"
+    },
+    {
+      "Flag": "Flag2",
+      "CreatedDate": "2022-08-22T21:16:10.0433333"
+    },
+    {
+      "Flag": "Configuration stopped",
+      "CreatedDate": "2022-08-22T21:16:24.24"
+    }
+  ],
+  "CommentInfo": [
+    {
+      "Comment": "This is a comment i need"
+    }
+  ],
+  "NotificationInfo": [
+    {
+      "FirstSample": {
+        "SampleID": 372,
+        "SampleTime": "2022-08-22T21:14:34.9307282"
+      },
+      "LastSample": {
+        "SampleID": 372,
+        "SampleTime": "2022-08-22T21:14:34.9307282"
+      },
+      "Count": 1,
+      "VariableName": "Raw Data",
+      "Notification": "Nueva warning"
+    },
+    {
+      "FirstSample": {
+        "SampleID": 372,
+        "SampleTime": "2022-08-22T21:14:34.9307282"
+      },
+      "LastSample": {
+        "SampleID": 401,
+        "SampleTime": "2022-08-22T21:15:37.1601481"
+      },
+      "Count": 21,
+      "VariableName": "Raw Data",
+      "Notification": "NuevaAlarma"
+    },
+    {
+      "FirstSample": {
+        "SampleID": 372,
+        "SampleTime": "2022-08-22T21:14:34.9307282"
+      },
+      "LastSample": {
+        "SampleID": 401,
+        "SampleTime": "2022-08-22T21:15:37.1601481"
+      },
+      "Count": 30,
+      "VariableName": "Q Residuals",
+      "Notification": "Sample outside 95% Q Residuals limit"
+    },
+    {
+      "FirstSample": {
+        "SampleID": 379,
+        "SampleTime": "2022-08-22T21:14:36.3427684"
+      },
+      "LastSample": {
+        "SampleID": 382,
+        "SampleTime": "2022-08-22T21:14:52.5562048"
+      },
+      "Count": 3,
+      "VariableName": "Raw Data",
+      "Notification": "Nueva warning"
+    },
+    {
+      "FirstSample": {
+        "SampleID": 379,
+        "SampleTime": "2022-08-22T21:14:36.3427684"
+      },
+      "LastSample": {
+        "SampleID": 379,
+        "SampleTime": "2022-08-22T21:14:36.3427684"
+      },
+      "Count": 1,
+      "VariableName": "F Residuals",
+      "Notification": "Sample outside 95% F Residuals limit"
+    },
+    {
+      "FirstSample": {
+        "SampleID": 389,
+        "SampleTime": "2022-08-22T21:14:53.9961043"
+      },
+      "LastSample": {
+        "SampleID": 392,
+        "SampleTime": "2022-08-22T21:15:35.3250533"
+      },
+      "Count": 3,
+      "VariableName": "Raw Data",
+      "Notification": "Nueva warning"
+    },
+    {
+      "FirstSample": {
+        "SampleID": 389,
+        "SampleTime": "2022-08-22T21:14:53.9961043"
+      },
+      "LastSample": {
+        "SampleID": 389,
+        "SampleTime": "2022-08-22T21:14:53.9961043"
+      },
+      "Count": 1,
+      "VariableName": "F Residuals",
+      "Notification": "Sample outside 95% F Residuals limit"
+    },
+    {
+      "FirstSample": {
+        "SampleID": 399,
+        "SampleTime": "2022-08-22T21:15:36.7499064"
+      },
+      "LastSample": {
+        "SampleID": 400,
+        "SampleTime": "2022-08-22T21:15:36.9537703"
+      },
+      "Count": 2,
+      "VariableName": "Raw Data",
+      "Notification": "Nueva warning"
+    },
+    {
+      "FirstSample": {
+        "SampleID": 399,
+        "SampleTime": "2022-08-22T21:15:36.7499064"
+      },
+      "LastSample": {
+        "SampleID": 399,
+        "SampleTime": "2022-08-22T21:15:36.7499064"
+      },
+      "Count": 1,
+      "VariableName": "F Residuals",
+      "Notification": "Sample outside 95% F Residuals limit"
+    }
+  ]
+}
