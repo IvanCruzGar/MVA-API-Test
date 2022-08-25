@@ -534,9 +534,50 @@ class TestListElements(unittest.TestCase):
         ConfigID=resAPI['BasicInfo']['ConfigurationID']
         logger.debug(ConfigID)
         self.assertEqual((ConfigID),(resDB2[0]['ConfigurationID']),"Configuration ID was different")
-        #Check COnfiguration Name
-        ####################################################AQUI me quede###########################################################################
-
+        #Check Configuration Name
+        Parametros = {"config_id":ConfigID}
+        resDB3 = dbConex.get_DataSet(table = 'Configurations',dbParams=Parametros)
+        logger.debug(resDB3[0]['name'])
+        ConfigID=resAPI['BasicInfo']['Name']
+        logger.debug(ConfigID)
+        self.assertEqual((ConfigID),(resDB3[0]['name']),"Configuration ID was different")
+        #Check Start time and end time 
+        Parametros = {"ID":CRID}
+        resDB4 = dbConex.get_DataSet(table = 'DataMaster',dbParams=Parametros)
+        logger.debug(resDB4[0]['StartTime'])
+        startTime=resAPI['BasicInfo']['StartTime']# round to ms
+        logger.debug(startTime)
+        startTimeDB=str(resDB4[0]['StartTime'])
+        startTime=startTime.replace('T',' ')
+        self.assertEqual(startTimeDB[:22],(startTime[:22]),"Configuration start time was different")
+        #End time
+        stopTime=resAPI['BasicInfo']['StopTime']# stop to ms
+        logger.debug(stopTime)
+        endTimeDB=str(resDB4[0]['EndTime'])
+        logger.debug(endTimeDB)
+        stopTime=stopTime.replace('T',' ')
+        self.assertEqual(stopTime[:22],(endTimeDB[:22]),"Configuration stop time was different")
+        #Flags
+        Parametros = {"DataMasterID":CRID}
+        resDB5 = dbConex.get_DataSet(table = 'ResultFlag',dbParams=Parametros)
+        flagInfo=resAPI['FlagInfo']
+        self.assertEqual(len(flagInfo),len(resDB5),"Flag size are different")
+        logger.debug(flagInfo)
+        logger.debug(resDB5)
+        for i in range(len(flagInfo)):
+            flagAPI=flagInfo[i]['Flag']
+            logger.debug(flagAPI)
+            Parametros = {"name":flagAPI}
+            resDB6 = dbConex.get_DataSet(table = 'Flag',dbParams=Parametros)
+            self.assertNotEqual([],resDB6,"Flag doesnt exist")
+            FlagID=resDB6[0]['flag_id']
+            Parametros = {"DataMasterID":CRID,"FlagID":FlagID}
+            resDB7 = dbConex.get_DataSet(table="ResultFlag",dbParams=Parametros)
+            date=str(resDB7[0]["CreatedDate"])[0:22]
+            flagAPIdate=str(flagInfo[i]['CreatedDate'][0:22]).replace("T"," ")
+            logger.debug(date)
+            logger.debug(flagAPIdate)
+            self.assertEqual(date,flagAPIdate,"Dates dont match")
 
 
 

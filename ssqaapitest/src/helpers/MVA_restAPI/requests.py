@@ -14,9 +14,7 @@ class Endpoints(object):
         
         
         self.requestUtility = RequestsUtility()
-        auth= "/auth/LogIn"
         otroNombre = {"username" : "API1", "password" : "Aspen100"}
-        
         response = self.requestUtility.post('/auth/LogIn', payload=otroNombre)
         logger.debug('Token created')
         logger.debug(response)
