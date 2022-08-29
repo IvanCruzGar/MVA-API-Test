@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function find_all(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
+    sort_table(elem, key(colIndex));
+}
+
+function show_all_extras() {
+    find_all('.col-result').forEach(show_extras);
+}
+
+function hide_all_extras() {
+    find_all('.col-result').forEach(hide_extras);
+}
+
+function show_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.remove("collapsed");
+    expandcollapse.classList.remove("expander");
+    expandcollapse.classList.add("collapser");
+}
+
+function hide_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.add("collapsed");
+    expandcollapse.classList.remove("collapser");
+    expandcollapse.classList.add("expander");
+}
+
+function show_filters() {
+    var filter_items = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_items.length; i++)
+        filter_items[i].hidden = false;
+}
+
+function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    find_all('.col-result').forEach(function(elem) {
+        var collapsed = get_query_parameter('collapsed') || 'Passed';
+        var extras = elem.parentNode.nextElementSibling;
+        var expandcollapse = document.createElement("span");
+        if (extras.classList.contains("collapsed")) {
+            expandcollapse.classList.add("expander")
+        } else if (collapsed.includes(elem.innerHTML)) {
+            extras.classList.add("collapsed");
+            expandcollapse.classList.add("expander");
+        } else {
+            expandcollapse.classList.add("collapser");
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener("click", function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+                show_extras(event.currentTarget);
+            } else {
+                hide_extras(event.currentTarget);
+            }
+        });
+    })
+}
+
+function get_query_parameter(name) {
+    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
+function init () {
+    reset_sort_headers();
+
+    add_collapse();
+
+    show_filters();
+
+    sort_column(find('.initial-sort'));
+
+    find_all('.sortable').forEach(function(elem) {
+        elem.addEventListener("click",
+                              function(event) {
+                                  sort_column(elem);
+                              }, false)
+    });
+
+};
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = document.getElementById("results-table-head");
+    document.getElementById('results-table').remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName("BODY")[0].appendChild(parent);
+}
+
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+
+        if (key_a == key_b) return 0;
+
+        if (reversed) {
+            return (key_a < key_b ? 1 : -1);
+        } else {
+            return (key_a > key_b ? 1 : -1);
+        }
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function key_alpha(col_index) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+    };
+}
+
+function key_num(col_index) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function reset_sort_headers() {
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function is_all_rows_hidden(value) {
+  return value.hidden == false;
+}
+
+function filter_table(elem) {
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var outcome_rows = document.getElementsByClassName(class_outcome);
+
+    for(var i = 0; i < outcome_rows.length; i++){
+        outcome_rows[i].hidden = !elem.checked;
+    }
+
+    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var all_rows_hidden = rows.length == 0 ? true : false;
+    var not_found_message = document.getElementById("not-found-message");
+    not_found_message.hidden = !all_rows_hidden;
+}
+</script>
+    <h1>Reporteotro.html</h1>
+    <p>Report generated on 25-Aug-2022 at 19:47:59 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v2.1.1</p>
+    <h2>Summary</h2>
+    <p>38 tests ran in 5.83 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">23 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">15 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable numeric" col="duration">Duration</th>
+          <th>Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrievMetaInformationforConfigurationRuns_InvalidConfigurationRun</td>
+          <td class="col-duration">0.08</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrievMetaInformationforConfigurationRuns_InvalidConfigurationRun&gt;<br/><br/>    @pytest.mark.vsts800107<br/>    def test_RetrievMetaInformationforConfigurationRuns_InvalidConfigurationRun(self):<br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_RConfMetaConfId(RevID=0, expRes=400, empRes=True)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:596: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:126: in get_RConfMetaConfId<br/>    api_res = self.requestUtility.get(&quot;/Configuration/Metadata?configurationRevisionId=&quot;+str(RevID),expected_status_code=expRes,resEmpty=empRes)<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5C14A08&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 400, Actual status code: 500,URL:http://172.22.4.53:9001/AspenProcessPulse/api/Configuration/Metadata?configurationRevisionId=0, Response Json: {}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:594 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrievMetaInformationforConfigurationRuns_InvalidConfigurationRun
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 329
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;5Lip7g1IczRlPZBaBeveWpPnanqmqA4wR4IFJV2D5sbLvIqQgugDDmw2Iyl1I5JK4gFN+lvNe5qMuV/eqtWOmBUhkF6z0gxO0qIPiJcau/6T1HHoAme8nZKb/L9qista5FPQyKe2WlVzf3+MPTMahgukaEwGOijAxIcBWkQpJzVnIMrihz33Qoh8ilXznB/SfrZUWh9RqVbp/dppPd5SBkMARdEyle+qDKpiuCeMKV8=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:53.734191Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/Metadata?configurationRevisionId=0 HTTP/1.1&quot; 500 83<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrievMetaInformationforConfigurationRuns_NonExistingConfigurationRun</td>
+          <td class="col-duration">0.10</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrievMetaInformationforConfigurationRuns_NonExistingConfigurationRun&gt;<br/><br/>    @pytest.mark.vsts800106<br/>    def test_RetrievMetaInformationforConfigurationRuns_NonExistingConfigurationRun(self):<br/>    <br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_RConfMetaConfId(RevID=200, expRes=204, empRes=True)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:589: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:126: in get_RConfMetaConfId<br/>    api_res = self.requestUtility.get(&quot;/Configuration/Metadata?configurationRevisionId=&quot;+str(RevID),expected_status_code=expRes,resEmpty=empRes)<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5C534C8&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 204, Actual status code: 500,URL:http://172.22.4.53:9001/AspenProcessPulse/api/Configuration/Metadata?configurationRevisionId=200, Response Json: {}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:587 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrievMetaInformationforConfigurationRuns_NonExistingConfigurationRun
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;jJxmjekqRE5sYpsR7smTYwx5wLkgPW8gVqD0BSFcsSJQ29NxZ4KaeXWS1oTyoEL7oA09lqp8Md+VVzJ7UzOYNwqnq/nvxyBK6ZMsXfDLQleF6ZPizWpISaKOUsA4WSmzSwAn+DpJ07W6aCsprfh+8pcUTWui/VNWJZ88YzNiXlDLbfZdBTEwMDw44S033iWAYKkkiz84ugV7bsMdaD0qgAvK/p1OdpesG8NFUBIfJbM=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:53.9281827Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/Metadata?configurationRevisionId=200 HTTP/1.1&quot; 500 85<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveConfigurationMetadatabyRevisionID_InvalidRevisionID</td>
+          <td class="col-duration">0.07</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveConfigurationMetadatabyRevisionID_InvalidRevisionID&gt;<br/><br/>    @pytest.mark.vsts792457<br/>    def test_RetrieveConfigurationMetadatabyRevisionID_InvalidRevisionID(self):<br/>    <br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       resAPI = endpoints.get_RConfMetaConfId(RevID=0,expRes=400,empRes=True)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:488: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:126: in get_RConfMetaConfId<br/>    api_res = self.requestUtility.get(&quot;/Configuration/Metadata?configurationRevisionId=&quot;+str(RevID),expected_status_code=expRes,resEmpty=empRes)<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5D55AC8&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 400, Actual status code: 500,URL:http://172.22.4.53:9001/AspenProcessPulse/api/Configuration/Metadata?configurationRevisionId=0, Response Json: {}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:486 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveConfigurationMetadatabyRevisionID_InvalidRevisionID
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;P1Up/H+fHWpX71WxUEOcuZw0PQJKmPDvN8Pny7UDMGXTyioP8A12BysO9JaCBo/vfMn1WTYdmvGIKeTrzOgRpWaScKeZVRflsqwcpZji8iRwg0bP0dX60DpY4ZwqmNmucJ23Lll7vGga0Dr8ZEHYbY+kyXelv2ObeJLf69KNOwt41O3rCPMl92oq/LNUiiNOynZpZ6Gs9JGjFfWt/NzL6C45/ckYNXRBjzHeE8mx150=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:54.1941828Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/Metadata?configurationRevisionId=0 HTTP/1.1&quot; 500 83<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveConfigurationMetadatabyRevisionID_NonExistingRevisionID</td>
+          <td class="col-duration">0.08</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveConfigurationMetadatabyRevisionID_NonExistingRevisionID&gt;<br/><br/>    @pytest.mark.vsts792458<br/>    def test_RetrieveConfigurationMetadatabyRevisionID_NonExistingRevisionID(self):<br/>    <br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       resAPI = endpoints.get_RConfMetaConfId(RevID=200,expRes=204,empRes=True)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:496: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:126: in get_RConfMetaConfId<br/>    api_res = self.requestUtility.get(&quot;/Configuration/Metadata?configurationRevisionId=&quot;+str(RevID),expected_status_code=expRes,resEmpty=empRes)<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5DAEF88&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 204, Actual status code: 500,URL:http://172.22.4.53:9001/AspenProcessPulse/api/Configuration/Metadata?configurationRevisionId=200, Response Json: {}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:494 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveConfigurationMetadatabyRevisionID_NonExistingRevisionID
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 329
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;u++Mwdv6Yg6ywvJ45dRpNoJ9kBY38kKoaLMUAtauO4ZOlb8rQaGapcyKThg1wRD/tgc1XIZdcikzBq+oic/25ONVCTfhtLQqy8epoANGW+l2q9LUNg+I3XLQXxUNjILZeNDxAhKlVMOTght5eNCODuUU70ehKxb6RTbTxkehgm+CiiU5dEXgeP0LLzjjB/TZqePgaJkT1hX/MIZJAl1F4m6yNnCwmpq0IFTzAT/Zjlg=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:54.308187Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/Metadata?configurationRevisionId=200 HTTP/1.1&quot; 500 85<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_InvalidDataSourceID</td>
+          <td class="col-duration">0.07</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveDataSourceMetadatabyDataSourceRevisionID_InvalidDataSourceID&gt;<br/><br/>    @pytest.mark.vsts792449<br/>    def test_RetrieveDataSourceMetadatabyDataSourceRevisionID_InvalidDataSourceID(self):<br/>    <br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_RDSMetaDSId(RevID=0,expRes=400,empRes=True)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:424: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:118: in get_RDSMetaDSId<br/>    api_res = self.requestUtility.get(&quot;/datasource/metadata?datasourceRevisionId=&quot;+str(RevID),expected_status_code=expRes,resEmpty = empRes)<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5D5FC88&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 400, Actual status code: 500,URL:http://172.22.4.53:9001/AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=0, Response Json: {}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:422 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_InvalidDataSourceID
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 329
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;kywPqTPLwNwx+6FJ6c0iYMhh0rsbkpecuWaO0icWAxQnw7G2umtsusfeVI43CNQOafMTzo6ujfGAlEwzkH4FD96qSo2GwWnyKBDLY13n20zFFI5qPtgMqOjMDRPgTYTDIwSyyEQsL47Rrx6bSrkEnlqXm7YG7tiCtUs4XQMFgjyM21MWQvIOeg00S7pouxuTkqRRSuS32bSp5vB/SJQomoU9By2UWeAyeEt+EBtUVXI=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:55.537188Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=0 HTTP/1.1&quot; 500 93<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_NonexistingDataSource</td>
+          <td class="col-duration">0.08</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveDataSourceMetadatabyDataSourceRevisionID_NonexistingDataSource&gt;<br/><br/>    @pytest.mark.vsts792450<br/>    def test_RetrieveDataSourceMetadatabyDataSourceRevisionID_NonexistingDataSource(self):<br/>    <br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_RDSMetaDSId(RevID=200,expRes=204,empRes=True)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:434: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:118: in get_RDSMetaDSId<br/>    api_res = self.requestUtility.get(&quot;/datasource/metadata?datasourceRevisionId=&quot;+str(RevID),expected_status_code=expRes,resEmpty = empRes)<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5DFD508&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 204, Actual status code: 500,URL:http://172.22.4.53:9001/AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=200, Response Json: {}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:432 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_NonexistingDataSource
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;cUYhUZfrXjQjliPzFZLgdnsDKINXG5xJXPyZ46mmEkB7o7OjAkgaiHn3ZXPcKoyVsiH240xwMbrwMOU3CNDevIBa1L9h7eCNvFS1is6zbcLnThPzyKkwObEoLdsfZD7i9jKZ93F3l1K9SLTRdKMppzVm29QYv/qK0/hOlgk9OUti6raUDpED0L6Z+BsnlHfjNhh59zE14ypCy22cQ8coC+B4zAXTHLXFIaGjEmKqASU=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:55.8351914Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=200 HTTP/1.1&quot; 500 93<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveListOfConfigurations</td>
+          <td class="col-duration">0.11</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveListOfConfigurations&gt;<br/><br/>    @pytest.mark.vsts787809<br/>    def test_RetrieveListOfConfigurations(self):<br/>        logger.debug(self.id())<br/>    <br/>        #Get information from DataBase and RestAPI<br/>        dbConex = dbConnection()<br/>        resDB = dbConex.get_DataSet(table = &#x27;ConfigurationRevision&#x27;)<br/>        resDB2 = dbConex.get_DataSet(table = &#x27;Configurations&#x27;)<br/>        endpoints = Endpoints()<br/>        resAPI = endpoints.get_ConfigurationList()<br/>    <br/>        #Check both have the same number of Configurations<br/>        self.assertEqual(len(resDB),len(resAPI))<br/>    <br/>        #Check structure information in the RestAPI response<br/>        info=list(resAPI[0].keys())<br/>        #logger.debug(info)<br/>        structure= [&#x27;ConfigId&#x27;, &#x27;ConfigName&#x27;, &#x27;RevisionNumber&#x27;, &#x27;ModeldName&#x27;, &#x27;CreatedDate&#x27;, &#x27;Status&#x27;, &#x27;IsEnabled&#x27;, &#x27;IsApproved&#x27;]<br/>&gt;       self.assertEqual(info, structure,&quot;Something went wrong&quot;)<br/><span class="error">E       AssertionError: Lists differ: [&#x27;Con[37 chars]&#x27;, &#x27;MethodName&#x27;, &#x27;CreatedDate&#x27;, &#x27;Status&#x27;, &#x27;IsE[17 chars]ved&#x27;] != [&#x27;Con[37 chars]&#x27;, &#x27;ModeldName&#x27;, &#x27;CreatedDate&#x27;, &#x27;Status&#x27;, &#x27;IsE[17 chars]ved&#x27;]</span><br/><span class="error">E       </span><br/><span class="error">E       First differing element 3:</span><br/><span class="error">E       &#x27;MethodName&#x27;</span><br/><span class="error">E       &#x27;ModeldName&#x27;</span><br/><span class="error">E       </span><br/><span class="error">E         [&#x27;ConfigId&#x27;,</span><br/><span class="error">E          &#x27;ConfigName&#x27;,</span><br/><span class="error">E          &#x27;RevisionNumber&#x27;,</span><br/><span class="error">E       -  &#x27;MethodName&#x27;,</span><br/><span class="error">E       ?     ^^^</span><br/><span class="error">E       </span><br/><span class="error">E       +  &#x27;ModeldName&#x27;,</span><br/><span class="error">E       ?    ++ ^</span><br/><span class="error">E       </span><br/><span class="error">E          &#x27;CreatedDate&#x27;,</span><br/><span class="error">E          &#x27;Status&#x27;,</span><br/><span class="error">E          &#x27;IsEnabled&#x27;,</span><br/><span class="error">E          &#x27;IsApproved&#x27;] : Something went wrong</span><br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:137: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:121 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveListOfConfigurations
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[ConfigurationRevision] ;
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[Configurations] ;
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;4DzYZu/UyZvINCR6qVCHRTIzoM30LFi5AAaFNDoQazWr13tylJ7+x7E0pADMst/R+v5PreQH+ewIrTQHxwPdjG/I1z36nBjrdBnKCAKkDMOG75R72P/AQY/nV3lXunege5feNZRJ89Yre1mjgJ6lSc3K5So3fS0kRd0N6mwtlBWcjb0UFiiQ+O0H56pM6okzVbQ0KUWlqeLqvxp3Z/1iyU4eqfoFtyVngrgPcdJSu44=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:56.6762063Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/List HTTP/1.1&quot; 200 2789
+[35mDEBUG   [0m root:requests.py:50 File Created
+[35mDEBUG   [0m root:requests.py:51 [{&#x27;ConfigId&#x27;: 1, &#x27;ConfigName&#x27;: &#x27;ASCII_PCA&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;PCA&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-06-28T21:35:01.847&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 2, &#x27;ConfigName&#x27;: &#x27;SIMCA_PCA&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;SIMCA&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-05T17:43:43.507&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 3, &#x27;ConfigName&#x27;: &#x27;PCA_Fresid&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;PCA&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-05T18:27:44.067&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 4, &#x27;ConfigName&#x27;: &#x27;PCA_Qresid&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;PCA&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-05T18:28:45.44&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 5, &#x27;ConfigName&#x27;: &#x27;PCA_Sresid&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;PCA&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-05T18:29:31.99&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 6, &#x27;ConfigName&#x27;: &#x27;SVMR&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;SVMR&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-06T16:04:42.81&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 7, &#x27;ConfigName&#x27;: &#x27;MCR&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;MCR&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-06T16:20:29.253&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 8, &#x27;ConfigName&#x27;: &#x27;MLR&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;MLR&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-06T16:21:16.807&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 9, &#x27;ConfigName&#x27;: &#x27;PCR_Fresid&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;Predict&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-06T16:23:22.247&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 10, &#x27;ConfigName&#x27;: &#x27;PCR_Qresid&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;Predict&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-06T16:24:21.03&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 11, &#x27;ConfigName&#x27;: &#x27;Batch&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;Batch&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-06T16:30:08.177&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 12, &#x27;ConfigName&#x27;: &#x27;ConfigFases&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;PCA&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-07-27T13:54:14.07&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 13, &#x27;ConfigName&#x27;: &#x27;NoModConfig&#x27;, &#x27;RevisionNumber&#x27;: 1, &#x27;MethodName&#x27;: &#x27;No Model&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-15T18:20:40.46&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 13, &#x27;ConfigName&#x27;: &#x27;NoModConfig&#x27;, &#x27;RevisionNumber&#x27;: 2, &#x27;MethodName&#x27;: &#x27;No Model&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-15T18:22:00.517&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 12, &#x27;ConfigName&#x27;: &#x27;ConfigFases&#x27;, &#x27;RevisionNumber&#x27;: 2, &#x27;MethodName&#x27;: &#x27;PCA&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T20:54:16.05&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;ConfigId&#x27;: 12, &#x27;ConfigName&#x27;: &#x27;ConfigFases&#x27;, &#x27;RevisionNumber&#x27;: 3, &#x27;MethodName&#x27;: &#x27;PCA&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T20:58:30.357&#x27;, &#x27;Status&#x27;: &#x27;Stopped&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}]<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveListOfDataSources</td>
+          <td class="col-duration">0.10</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveListOfDataSources&gt;<br/><br/>    @pytest.mark.vsts787805<br/>    def test_RetrieveListOfDataSources(self):<br/>    <br/>        logger.debug(self.id())<br/>    <br/>        #Get information from DataBase and RestAPI<br/>        dbConex = dbConnection()<br/>        resDB = dbConex.get_DataSet(table = &#x27;DataSourceRevision&#x27;)<br/>        resDB2 = dbConex.get_DataSet(table = &#x27;DataSource&#x27;)<br/>        endpoints = Endpoints()<br/>        resAPI = endpoints.get_DSList()<br/>    <br/>        #Check both have the same number of Data Sources<br/>&gt;       self.assertEqual(len(resDB),len(resAPI),&#x27;Diferent number of Data Sources&#x27;)<br/><span class="error">E       AssertionError: 13 != 12 : Diferent number of Data Sources</span><br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:35: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:25 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveListOfDataSources
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[DataSourceRevision] ;
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[DataSource] ;
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;4giphBpzKLcbLRN/wBKQAEPDpwjY15B3AtBc4MrMDT9VFkqfTyIjPjxAtD3r6k2nNSgfwlWIUOhIBhD/3q2K14PM8bJ7M+JUDhJdeqrSvdh+NW4mUMjBZ90bWR8Y3yVLQMcd2bwjsxpnwdB4wCcTco9jG8NMQP4K+vnjLPyl/VA3puDkOXXqAJq0lbdIWo868NjihNPUBXYKsEC8gHyUxTFqy/5B73W2/vUiH10x59A=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:56.8201922Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/DataSource/List HTTP/1.1&quot; 200 1759
+[35mDEBUG   [0m root:requests.py:34 File Created
+[35mDEBUG   [0m root:requests.py:35 [{&#x27;Id&#x27;: 13, &#x27;RevisionId&#x27;: 13, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;PruebaError&#x27;, &#x27;Type&#x27;: &#x27;ASCII&#x27;, &#x27;Created&#x27;: &#x27;2022-08-23T15:32:52.177&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 11, &#x27;RevisionId&#x27;: 11, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;pruebaFases&#x27;, &#x27;Type&#x27;: &#x27;ASCII&#x27;, &#x27;Created&#x27;: &#x27;2022-07-27T13:53:02.623&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 10, &#x27;RevisionId&#x27;: 10, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;Batch&#x27;, &#x27;Type&#x27;: &#x27;ASCII&#x27;, &#x27;Created&#x27;: &#x27;2022-07-06T16:29:08.24&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 9, &#x27;RevisionId&#x27;: 9, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;Eigen&#x27;, &#x27;Type&#x27;: &#x27;GRAMS&#x27;, &#x27;Created&#x27;: &#x27;2022-06-28T21:30:12.98&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 8, &#x27;RevisionId&#x27;: 8, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;PI&#x27;, &#x27;Type&#x27;: &#x27;PI&#x27;, &#x27;Created&#x27;: &#x27;2022-06-28T21:20:54.42&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 7, &#x27;RevisionId&#x27;: 7, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;Empower&#x27;, &#x27;Type&#x27;: &#x27;Empower&#x27;, &#x27;Created&#x27;: &#x27;2022-06-28T17:35:11.347&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 6, &#x27;RevisionId&#x27;: 6, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;Image&#x27;, &#x27;Type&#x27;: &#x27;Image&#x27;, &#x27;Created&#x27;: &#x27;2022-06-28T17:33:44.25&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 5, &#x27;RevisionId&#x27;: 5, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;ZEISS&#x27;, &#x27;Type&#x27;: &#x27;ZEISS&#x27;, &#x27;Created&#x27;: &#x27;2022-06-28T17:30:34.453&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 4, &#x27;RevisionId&#x27;: 4, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;OPUS&#x27;, &#x27;Type&#x27;: &#x27;OPUS&#x27;, &#x27;Created&#x27;: &#x27;2022-06-28T17:28:58.533&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 3, &#x27;RevisionId&#x27;: 3, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;JCAMP-DX&#x27;, &#x27;Type&#x27;: &#x27;JCAMP-DX&#x27;, &#x27;Created&#x27;: &#x27;2022-06-28T17:28:06.733&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 2, &#x27;RevisionId&#x27;: 2, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;GRAMS&#x27;, &#x27;Type&#x27;: &#x27;GRAMS&#x27;, &#x27;Created&#x27;: &#x27;2022-06-28T17:23:06.27&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}, {&#x27;Id&#x27;: 1, &#x27;RevisionId&#x27;: 1, &#x27;RevisionNumber&#x27;: 1, &#x27;Name&#x27;: &#x27;ASCII&#x27;, &#x27;Type&#x27;: &#x27;ASCII&#x27;, &#x27;Created&#x27;: &#x27;2022-06-28T17:22:11.743&#x27;, &#x27;IsEnabled&#x27;: True, &#x27;IsApproved&#x27;: False}]<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveListOfModels</td>
+          <td class="col-duration">0.12</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveListOfModels&gt;<br/><br/>    @pytest.mark.vsts787828<br/>    def test_RetrieveListOfModels(self):<br/>    <br/>        logger.debug(self.id())<br/>    <br/>        #Get information from DataBase and RestAPI<br/>        dbConex = dbConnection()<br/>        resDB = dbConex.get_DataSet(table = &#x27;ModelRevision&#x27;)<br/>        resDB2 = dbConex.get_DataSet(table = &#x27;Model&#x27;)<br/>        endpoints = Endpoints()<br/>        resAPI = endpoints.get_ModelList()<br/>    <br/>        #Check both have the same number of Data Sources<br/>        self.assertEqual(len(resDB),len(resAPI))<br/>    <br/>        #Check structure information in the RestAPI response<br/>        info=list(resAPI[0].keys())<br/>        #logger.debug(info)<br/>        structure= [&#x27;ModelId&#x27;, &#x27;RevisionID&#x27;, &#x27;Name&#x27;, &#x27;Revision&#x27;, &#x27;ModelSoftware&#x27;, &#x27;ModelType&#x27;, &#x27;UploadedBy&#x27;, &#x27;UploadedDate&#x27;, &#x27;IsApproved&#x27;, &#x27;IsEnabled&#x27;]<br/>        self.assertEqual(info, structure,&quot;Structure is wrong&quot;)<br/>    <br/>        #Check information of a random Model<br/>        aleat= random.randint(1, len(resDB))<br/>        logger.debug(aleat)<br/>        #ModelID<br/>        &quot;&quot;&quot;<br/>        logger.debug((resDB[aleat-1][&#x27;DataSourceID&#x27;]))<br/>        logger.debug(resAPI[-aleat][&#x27;Id&#x27;]) &quot;&quot;&quot;<br/>        self.assertEqual((resDB[aleat-1][&#x27;ModelID&#x27;]),(resAPI[aleat-1][&#x27;ModelId&#x27;]))<br/>        #RevisionID<br/>        &quot;&quot;&quot; logger.debug((resDB[aleat-1][&#x27;RevisionID&#x27;]))<br/>        logger.debug(resAPI[-aleat][&#x27;RevisionId&#x27;]) &quot;&quot;&quot;<br/>&gt;       self.assertEqual((resDB[aleat-1][&#x27;RevisionID&#x27;]),(resAPI[aleat-1][&#x27;RevisionID&#x27;]),&#x27;Revision&#x27;)<br/>        #Name<br/>        &quot;&quot;&quot; logger.debug((resDB2[aleat-1][&#x27;Name&#x27;]))<br/><span class="error">E       AssertionError: 14 != 13 : Revision</span><br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:100: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:71 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveListOfModels
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[ModelRevision] ;
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[Model] ;
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;v4IbxKbqEEWo1vdaPZ+wpFqCtvTxDh6DxMDEqAm4ivjGEf+KOp2Y7XNOksx/i9SFFWXNh35G8UONmMu1u7Pccv1a4YbghlYrRtMu7t1TIee37Di6glG9eAfQ9iq9lrDYw2l/rimwUD0c39DtwJx4QC//1hSLAzBFKjAgayIWjmlVBDULykOEx8fv7yoTcsEq5C+T/aaKj0gfA264DQ77XJc34/Xx1pMPTrzBo/h8ZBM=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:56.9491956Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Model/List HTTP/1.1&quot; 200 2909
+[35mDEBUG   [0m root:requests.py:42 File Created
+[35mDEBUG   [0m root:requests.py:43 [{&#x27;ModelId&#x27;: 1, &#x27;RevisionID&#x27;: 1, &#x27;Name&#x27;: &#x27;PCA_w_3-8&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;pca&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-06-28T14:07:38.9133333&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 2, &#x27;RevisionID&#x27;: 2, &#x27;Name&#x27;: &#x27;PCA_wo_3-8&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;pca&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-06-28T14:07:38.94&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 3, &#x27;RevisionID&#x27;: 3, &#x27;Name&#x27;: &#x27;PCA_OQ&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;pca&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-06-28T21:32:18.9866667&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 4, &#x27;RevisionID&#x27;: 4, &#x27;Name&#x27;: &#x27;MCR&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;mcr&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-05T17:42:16.75&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 5, &#x27;RevisionID&#x27;: 5, &#x27;Name&#x27;: &#x27;MLR&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;mlr&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-05T17:42:16.77&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 6, &#x27;RevisionID&#x27;: 6, &#x27;Name&#x27;: &#x27;PCA_Fresid&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;pca&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-05T17:42:16.7866667&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 7, &#x27;RevisionID&#x27;: 7, &#x27;Name&#x27;: &#x27;PCA_Qresid&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;pca&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-05T17:42:16.8033333&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 8, &#x27;RevisionID&#x27;: 8, &#x27;Name&#x27;: &#x27;PCA_Sresid&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;pca&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-05T17:42:16.82&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 9, &#x27;RevisionID&#x27;: 9, &#x27;Name&#x27;: &#x27;PCR_Fresid&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;pcr&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-05T17:42:16.8333333&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 10, &#x27;RevisionID&#x27;: 10, &#x27;Name&#x27;: &#x27;PCR_Qresid&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;pcr&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-05T17:42:16.85&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 11, &#x27;RevisionID&#x27;: 11, &#x27;Name&#x27;: &#x27;SIMCA_PCA_Fresid&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;classification&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-05T17:42:16.8666667&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 12, &#x27;RevisionID&#x27;: 12, &#x27;Name&#x27;: &#x27;SVR&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;svr&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-05T17:42:16.88&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 13, &#x27;RevisionID&#x27;: 14, &#x27;Name&#x27;: &#x27;Batch&#x27;, &#x27;Revision&#x27;: 2, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;batchmodel&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-06T16:41:58.79&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 13, &#x27;RevisionID&#x27;: 13, &#x27;Name&#x27;: &#x27;Batch&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;batchmodel&#x27;, &#x27;UploadedBy&#x27;: 4, &#x27;UploadedDate&#x27;: &#x27;2022-07-06T16:27:41.58&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}, {&#x27;ModelId&#x27;: 14, &#x27;RevisionID&#x27;: 15, &#x27;Name&#x27;: &#x27;fasesPCA&#x27;, &#x27;Revision&#x27;: 1, &#x27;ModelSoftware&#x27;: &#x27;&#x27;, &#x27;ModelType&#x27;: &#x27;pca&#x27;, &#x27;UploadedBy&#x27;: 7, &#x27;UploadedDate&#x27;: &#x27;2022-07-27T13:53:30.9733333&#x27;, &#x27;IsApproved&#x27;: False, &#x27;IsEnabled&#x27;: False}]
+[35mDEBUG   [0m root:test_MVA.py:91 14<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveModelMetadatabyModelRevisionID_InvalidModelRevisionID</td>
+          <td class="col-duration">0.08</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveModelMetadatabyModelRevisionID_InvalidModelRevisionID&gt;<br/><br/>    @pytest.mark.vsts792459<br/>    def test_RetrieveModelMetadatabyModelRevisionID_InvalidModelRevisionID(self):<br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_RModelMetaMRID(RevID=0,expRes=400,empRes=True)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:250: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:110: in get_RModelMetaMRID<br/>    api_res = self.requestUtility.get(&quot;/model/metadata?modelRevisionId=&quot;+str(RevID),expected_status_code=expRes,resEmpty = empRes)<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5CB5D08&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 400, Actual status code: 200,URL:http://172.22.4.53:9001/AspenProcessPulse/api/model/metadata?modelRevisionId=0, Response Json: {}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:248 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveModelMetadatabyModelRevisionID_InvalidModelRevisionID
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;9lphk5vNUH/d45xrnkpE+wTnGnnR6Hck+s988+NSORC/E1ocYt5LQ5c9Xs/XQ/r4WICyjCy/96Pp60TlcfB0L4ulnpOv/IJgXZCn2TvywRkemuWpjoI0ry4QN3c0D40lF0ZAzXqKGzRWsmKeIah0nyrxNR/QR6l0jAgwOvyHlhCttEqNjIH8F6asTnodC3eaewuQvnn2xixcj1zKEg4nXJARUnWhxJx41l/wYZ+B9go=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:57.4692037Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/model/metadata?modelRevisionId=0 HTTP/1.1&quot; 200 7<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveModelMetadatabyModelRevisionID_NonexistingModelRevisionID</td>
+          <td class="col-duration">0.09</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveModelMetadatabyModelRevisionID_NonexistingModelRevisionID&gt;<br/><br/>    @pytest.mark.vsts792460<br/>    def test_RetrieveModelMetadatabyModelRevisionID_NonexistingModelRevisionID(self):<br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_RModelMetaMRID(RevID=200,expRes=204,empRes=True)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:313: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:110: in get_RModelMetaMRID<br/>    api_res = self.requestUtility.get(&quot;/model/metadata?modelRevisionId=&quot;+str(RevID),expected_status_code=expRes,resEmpty = empRes)<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5D5A448&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 204, Actual status code: 200,URL:http://172.22.4.53:9001/AspenProcessPulse/api/model/metadata?modelRevisionId=200, Response Json: {}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:311 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveModelMetadatabyModelRevisionID_NonexistingModelRevisionID
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;fQS+0RPtnrbU9A5eYldF7LA3G2CIcYgu3CEnW+lWgrYJMbj4rVAYZ0SxrKaDRU86dheXJI6zDWBS8QuzL1btLju4Cql5+ZXV4GjEAd/+yqHMIGjkyd/67DQssSMHdU56enwhY2oahEkFr4pVM1NHQZ5J+lsVS69ONJWOSQcL7NlPbAwo6eRv2qLTIj+aswH4cYiZxiLIx/m74ovWwOlpWhtFFyfKVohWB+jE3sBkqrc=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:57.8022112Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/model/metadata?modelRevisionId=200 HTTP/1.1&quot; 200 7<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveRawData_ConfigurationRunID</td>
+          <td class="col-duration">0.09</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveRawData_ConfigurationRunID&gt;<br/><br/>    @pytest.mark.vsts788343<br/>    def test_RetrieveRawData_ConfigurationRunID(self):<br/>    <br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_RawDataID(RevID=2)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:211: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:93: in get_RawDataID<br/>    api_res = self.requestUtility.get(&quot;/Configuration/RawData?ConfigurationRunId=&quot;+str(RevID))<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5C53A48&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 200, Actual status code: 500,URL:http://172.22.4.53:9001/AspenProcessPulse/api/Configuration/RawData?ConfigurationRunId=2, Response Json: {&#x27;Error&#x27;: {&#x27;Message&#x27;: &quot;Invalid object name &#x27;AspenProcessPulse.dbo.ConfigurationRevision&#x27;.&quot;, &#x27;Details&#x27;: &#x27;&#x27;}}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:209 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveRawData_ConfigurationRunID
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;/Nk277jZyjD3BZffO7Cqyk1uV9hflKzFT8TcCWDm7V9QxjVyNdnUoVios++SM5cIHvQZ61deksWVoYg5H8cvQ96g/JYORvJfDMJ5MhUgxVMq9KxQK9hhx/uX6SPOZmyxwt0g6H3HKVtIRNPZ2GZVT5+5DL3f4Uv3uTb7D+JIFX39EnGIKoE4ksT8ombwdArDX7QNLQRDCp78ssU/v9JKaGTnOkxMcjsumbm7LZJJUrY=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:58.3242038Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/RawData?ConfigurationRunId=2 HTTP/1.1&quot; 500 106<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveRawData_OffsetandRows</td>
+          <td class="col-duration">0.09</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_RetrieveRawData_OffsetandRows&gt;<br/><br/>    @pytest.mark.vsts788347<br/>    def test_RetrieveRawData_OffsetandRows(self):<br/>    <br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_RDIDOffset(RevID=1,Off=4,Rows=2)<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:221: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:101: in get_RDIDOffset<br/>    api_res = self.requestUtility.get(&quot;/Configuration/RawData?ConfigurationRunId=&quot;+str(RevID)+&quot;&amp;Offset=&quot;+str(Off)+&quot;&amp;Rows=&quot;+str(Rows))<br/>ssqaapitest\src\utilities\requestsUtility.py:85: in get<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5E1BD08&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 200, Actual status code: 500,URL:http://172.22.4.53:9001/AspenProcessPulse/api/Configuration/RawData?ConfigurationRunId=1&amp;Offset=4&amp;Rows=2, Response Json: {&#x27;Error&#x27;: {&#x27;Message&#x27;: &quot;Invalid object name &#x27;AspenProcessPulse.dbo.ConfigurationRevision&#x27;.&quot;, &#x27;Details&#x27;: &#x27;&#x27;}}</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:219 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveRawData_OffsetandRows
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;QB7X2rqzuySBUOtlI9Pp2uEtaDSBUhXmyhTtAk9BWfWSZIT7m+CqBnLjsqJoOypk3YiFhw9HMai297Kl829nRYSaFl9JSmzx6JU1WrTdYG1ibgEyEydsD1db/AGGyW81MRYT/J67xToRLoT3dgo4ndPuOtlqwmb2fcNRPc+05Wp5aQjo9nPXOHXNxxMNLunJKNoKD2bWcLmwCKxnzwft7akXSuzlD5IGu/FjNu0Er04=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:58.4602034Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/RawData?ConfigurationRunId=1&amp;Offset=4&amp;Rows=2 HTTP/1.1&quot; 500 106<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_ReturnCode401WrongPassword</td>
+          <td class="col-duration">0.10</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_ReturnCode401WrongPassword&gt;<br/><br/>    @pytest.mark.vsts791965<br/>    def test_ReturnCode401WrongPassword(self):<br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_code401WrongPassword()<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:194: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:77: in get_code401WrongPassword<br/>    api_res = self.requestUtility.post(&#x27;/auth/LogIn&#x27;, payload=usuarioincorrecto,expected_status_code=401)<br/>ssqaapitest\src\utilities\requestsUtility.py:56: in post<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D4CCE608&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 401, Actual status code: 200,URL:http://172.22.4.53:9001/AspenProcessPulse/api/auth/LogIn, Response Json: Invalid credentials.</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:192 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_ReturnCode401WrongPassword
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;IVHpIaEF5EiRNIBfAmvLskFdUvL81KIyBaKUJimwAnb7Kx1TVTuoCSAJ0vIwAUEzEVtOG3ATAgPLd9AGvJfaUwS8+YPoTtewt5yaP2NeA+PMe0jw3QD3nGR5ax7Rg8s6dy7fZLmOu3C75MNWUOm/kwZYg6JLE8na3hGve5Dkem8un8Ja8j18tVFCzwSiy7YVATV8wJKOmeWmN25BU5Z7gP4441KK7hgp3aV2c6VfNmk=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:58.6682046Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 25<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_ReturnCode401WrongUser</td>
+          <td class="col-duration">0.13</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;ssqaapitest.test.MVArestAPI.test_MVA.TestListElements testMethod=test_ReturnCode401WrongUser&gt;<br/><br/>    @pytest.mark.vsts791785<br/>    def test_ReturnCode401WrongUser(self):<br/>        logger.debug(self.id())<br/>        endpoints = Endpoints()<br/>&gt;       res = endpoints.get_code401WrongUser()<br/><br/>ssqaapitest\test\MVArestAPI\test_MVA.py:187: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/>ssqaapitest\src\helpers\MVA_restAPI\requests.py:70: in get_code401WrongUser<br/>    api_res = self.requestUtility.post(&#x27;/auth/LogIn&#x27;, payload=usuarioincorrecto,expected_status_code=401)<br/>ssqaapitest\src\utilities\requestsUtility.py:56: in post<br/>    self.assert_status_code()<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>self = &lt;ssqaapitest.src.utilities.requestsUtility.RequestsUtility object at 0x000001D4D5D7E9C8&gt;<br/><br/>    def assert_status_code(self):<br/>&gt;       assert self.status_code == self.expected_status_code, f&quot;Bad Status code.&quot; \<br/>                                                              f&quot;Expected {self.expected_status_code}, &quot; \<br/>                                                              f&quot;Actual status code: {self.status_code},&quot; \<br/>                                                              f&quot;URL:{self.url}, Response Json: {self.rs_json} &quot;<br/><span class="error">E       AssertionError: Bad Status code.Expected 401, Actual status code: 200,URL:http://172.22.4.53:9001/AspenProcessPulse/api/auth/LogIn, Response Json: User does not exist.</span><br/><br/>ssqaapitest\src\utilities\requestsUtility.py:30: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:185 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_ReturnCode401WrongUser
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;JTVG6ghaaTMe3nXegpFl3Xq+5WMBXMCvSz6WNjCnjzMr0UPfUQOFXNPA4lhLk/Nzfg4PDDodqXuckF/oOeuInbU70KsgdFDQ1UIXbTQW9wrxUwib052Ns6sU726IlHHC/mzHo+SQEmVjlCrN+L1My1JhI7+XjlXRVEw8RBhVm9g1QadwVwctbnjnnTuJkZ+BzTE/xwkwf6BsKO8pFiOvNNRJVth4+a4vC9uTFMpxWys=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:58.8132117Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 25<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveConfigurationMetadatabyRevisionID</td>
+          <td class="col-duration">0.15</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:443 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveConfigurationMetadatabyRevisionID
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;fxVvIAJzerbJR5p61xj3fZVW1qAv/KiDqbiHJtBeLRRp7uzTsuBQ9GTZq4Nsb/ihzbUtdEllZeda4CPByxuV6COZu80oPPJx+cTnQN8uBZv4BXyZUMd0b8dKrY3AfXpCcexhFXrCaSElvd3kzP+4oO6ba0viDa7hjN52zHWzhdcCpbkHBatPw4zYQ2H1O7i04SdfUvpgrjVlVFgoN1QqBq2vqdOfkjUq3OYHTm7uIf4=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:54.0501966Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/Metadata?configurationRevisionId=1 HTTP/1.1&quot; 200 976
+[35mDEBUG   [0m root:requests.py:129 File Created
+[35mDEBUG   [0m root:requests.py:130 [{&#x27;Configuration ID&#x27;: 1, &#x27;Configuration Name&#x27;: &#x27;ASCII_PCA&#x27;, &#x27;Revision Number&#x27;: 1, &#x27;Method Name&#x27;: &#x27;PCA&#x27;, &#x27;Model Name&#x27;: &#x27;PCA_OQ&#x27;, &#x27;Transformations&#x27;: None, &#x27;Online Calculations&#x27;: None, &#x27;Output&#x27;: None, &#x27;Notifications&#x27;: [{&#x27;Notification&#x27;: &#x27;Sample outside 95% F Residuals limit&#x27;, &#x27;Variable Name&#x27;: &#x27;F Residuals&#x27;, &#x27;Message&#x27;: &#x27;[configName]: 95% F Residuals limit exceeded, sample: [sample] with timestamp [timestamp]&#x27;}, {&#x27;Notification&#x27;: &quot;Sample outside 95% Hotelling&#x27;s T² limit&quot;, &#x27;Variable Name&#x27;: &quot;Hotelling&#x27;s T²&quot;, &#x27;Message&#x27;: &quot;[configName]: 95% Hotelling&#x27;s T² limit exceeded, sample: [sample] with timestamp [timestamp]&quot;}, {&#x27;Notification&#x27;: &#x27;Sample outside 95% model limit&#x27;, &#x27;Variable Name&#x27;: &#x27;Scores&#x27;, &#x27;Message&#x27;: &quot;&#x27;[configName]&#x27;: 95% model limit exceeded, sample: [sample] with timestamp [timestamp]&quot;}, {&#x27;Notification&#x27;: &#x27;Sample outside 95% Q Residuals limit&#x27;, &#x27;Variable Name&#x27;: &#x27;Q Residuals&#x27;, &#x27;Message&#x27;: &#x27;[configName]: 95% Q Residuals limit exceeded, sample: [sample] with timestamp [timestamp]&#x27;}], &#x27;Users With Access&#x27;: []}]
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[ConfigurationRevision] ;
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[Configurations] ;
+[35mDEBUG   [0m root:test_MVA.py:454 [&#x27;Configuration ID&#x27;, &#x27;Configuration Name&#x27;, &#x27;Revision Number&#x27;, &#x27;Method Name&#x27;, &#x27;Model Name&#x27;, &#x27;Transformations&#x27;, &#x27;Online Calculations&#x27;, &#x27;Output&#x27;, &#x27;Notifications&#x27;, &#x27;Users With Access&#x27;]
+[35mDEBUG   [0m root:test_MVA.py:477 PCA_OQ
+[35mDEBUG   [0m root:test_MVA.py:478 &lt;method&gt;&lt;id&gt;8&lt;/id&gt;&lt;name&gt;PCA&lt;/name&gt;&lt;model&gt;&lt;id&gt;3&lt;/id&gt;&lt;/model&gt;&lt;methodsettings&gt;
+  &lt;outputmatrix&gt;6,2,3,4,7,8&lt;/outputmatrix&gt;
+  &lt;hotellingssiglevel&gt;3&lt;/hotellingssiglevel&gt;
+  &lt;qresidualssiglevel&gt;3&lt;/qresidualssiglevel&gt;
+  &lt;fresidualssiglevel&gt;3&lt;/fresidualssiglevel&gt;
+  &lt;influencesiglevel&gt;3&lt;/influencesiglevel&gt;
+  &lt;plotlayout&gt;
+    &lt;selectedlayout&gt;8&lt;/selectedlayout&gt;
+    &lt;layout plotid=&quot;1&quot; plotname=&quot;F Residuals&quot; modelname=&quot;PCA_OQ&quot; /&gt;
+    &lt;layout plotid=&quot;2&quot; plotname=&quot;Histogram&quot; modelname=&quot;PCA_OQ&quot; /&gt;
+    &lt;layout plotid=&quot;3&quot; plotname=&quot;Hotelling&#x27;s T²&quot; modelname=&quot;PCA_OQ&quot; /&gt;
+    &lt;layout plotid=&quot;4&quot; plotname=&quot;Process Variable&quot; modelname=&quot;PCA_OQ&quot; /&gt;
+  &lt;/plotlayout&gt;
+&lt;/methodsettings&gt;&lt;/method&gt;
+[35mDEBUG   [0m root:test_MVA.py:480 PCA_OQ<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_ASCII</td>
+          <td class="col-duration">0.19</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:322 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_ASCII
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;9Q9UgC4xFMvsiHnbl+uDwUgvc/vmP+x4E6aO3yfIWWmtWasd8H01aLlP7MOVsFJUyGZI5bmVuwzF4N1jarDFpO44S6Fh6QbdeqaZwJy0Mpbf5Cd9lvnZTXX8Z0eFChC9WZtECm8KVH4GtZPrKZ5WkP8IkPc6H6MJtjs3u9yWUgFPL/PoYyDYhXlYzxz1v5o1qxZAAS2Z0i0LIM4GKAM2+ROFguCwgBddn7sYrArIG6Q=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:54.4241846Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=1 HTTP/1.1&quot; 200 5516
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;226&#x27;}, {&#x27;Label&#x27;: &#x27;Timestamp variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Non-numeric variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Numeric variables&#x27;, &#x27;Value&#x27;: &#x27;This is column 1, This is column 2, This is column 3, This is column 4, This is column 5, This is column 6, This is column 7, This is column 8, This is column 9, This is column 10, This is column 11, This is column 12, This is column 13, This is column 14, This is column 15, This is column 16, This is column 17, This is column 18, This is column 19, This is column 20, This is column 21, This is column 22, This is column 23, This is column 24, This is column 25, This is column 26, This is column 27, This is column 28, This is column 29, This is column 30, This is column 31, This is column 32, This is column 33, This is column 34, This is column 35, This is column 36, This is column 37, This is column 38, This is column 39, This is column 40, This is column 41, This is column 42, This is column 43, This is column 44, This is column 45, This is column 46, This is column 47, This is column 48, This is column 49, This is column 50, This is column 51, This is column 52, This is column 53, This is column 54, This is column 55, This is column 56, This is column 57, This is column 58, This is column 59, This is column 60, This is column 61, This is column 62, This is column 63, This is column 64, This is column 65, This is column 66, This is column 67, This is column 68, This is column 69, This is column 70, This is column 71, This is column 72, This is column 73, This is column 74, This is column 75, This is column 76, This is column 77, This is column 78, This is column 79, This is column 80, This is column 81, This is column 82, This is column 83, This is column 84, This is column 85, This is column 86, This is column 87, This is column 88, This is column 89, This is column 90, This is column 91, This is column 92, This is column 93, This is column 94, This is column 95, This is column 96, This is column 97, This is column 98, This is column 99, This is column 100, This is column 101, This is column 102, This is column 103, This is column 104, This is column 105, This is column 106, This is column 107, This is column 108, This is column 109, This is column 110, This is column 111, This is column 112, This is column 113, This is column 114, This is column 115, This is column 116, This is column 117, This is column 118, This is column 119, This is column 120, This is column 121, This is column 122, This is column 123, This is column 124, This is column 125, This is column 126, This is column 127, This is column 128, This is column 129, This is column 130, This is column 131, This is column 132, This is column 133, This is column 134, This is column 135, This is column 136, This is column 137, This is column 138, This is column 139, This is column 140, This is column 141, This is column 142, This is column 143, This is column 144, This is column 145, This is column 146, This is column 147, This is column 148, This is column 149, This is column 150, This is column 151, This is column 152, This is column 153, This is column 154, This is column 155, This is column 156, This is column 157, This is column 158, This is column 159, This is column 160, This is column 161, This is column 162, This is column 163, This is column 164, This is column 165, This is column 166, This is column 167, This is column 168, This is column 169, This is column 170, This is column 171, This is column 172, This is column 173, This is column 174, This is column 175, This is column 176, This is column 177, This is column 178, This is column 179, This is column 180, This is column 181, This is column 182, This is column 183, This is column 184, This is column 185, This is column 186, This is column 187, This is column 188, This is column 189, This is column 190, This is column 191, This is column 192, This is column 193, This is column 194, This is column 195, This is column 196, This is column 197, This is column 198, This is column 199, This is column 200, This is column 201, This is column 202, This is column 203, This is column 204, This is column 205, This is column 206, This is column 207, This is column 208, This is column 209, This is column 210, This is column 211, This is column 212, This is column 213, This is column 214, This is column 215, This is column 216, This is column 217, This is column 218, This is column 219, This is column 220, This is column 221, This is column 222, This is column 223, This is column 224, This is column 225, This is column 226&#x27;}, {&#x27;Label&#x27;: &#x27;Watch folder&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\ASCII\\Watch&#x27;}, {&#x27;Label&#x27;: &#x27;Example file:&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\ASCII\\Input\\635950600420199449.txt&#x27;}, {&#x27;Label&#x27;: &#x27;Use timestamp from file&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Restore strategy&#x27;, &#x27;Value&#x27;: &#x27;None&#x27;}, {&#x27;Label&#x27;: &#x27;Spectra Direction&#x27;, &#x27;Value&#x27;: &#x27;ID_READING_DIRECTION_LEFT_RIGHT&#x27;}, {&#x27;Label&#x27;: &#x27;Use first column as sample information&#x27;, &#x27;Value&#x27;: &#x27;True&#x27;}, {&#x27;Label&#x27;: &#x27;Use first row as header&#x27;, &#x27;Value&#x27;: &#x27;True&#x27;}, {&#x27;Label&#x27;: &#x27;Skip rows&#x27;, &#x27;Value&#x27;: &#x27;0&#x27;}, {&#x27;Label&#x27;: &#x27;Skip cols&#x27;, &#x27;Value&#x27;: &#x27;0&#x27;}, {&#x27;Label&#x27;: &#x27;Treat multiple-line file as one sample&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Separator&#x27;, &#x27;Value&#x27;: &#x27;;&#x27;}, {&#x27;Label&#x27;: &#x27;Decimal Separator&#x27;, &#x27;Value&#x27;: &#x27;,&#x27;}, {&#x27;Label&#x27;: &#x27;Process double quotes&#x27;, &#x27;Value&#x27;: &#x27;True&#x27;}, {&#x27;Label&#x27;: &#x27;Treat consecutive separators as one&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Transpose data&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Date/Time format:&#x27;, &#x27;Value&#x27;: &#x27;yyyy-MM-dd HH:mm:ss&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_Batch</td>
+          <td class="col-duration">0.19</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:412 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_Batch
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;Jmuynwn82pILGRXCRAQjPrll6DeFvepE76nEJWnZNp/+g++ErWLR8qCfTAnlK2/3oYYV0cDwbO90zS6rEBCW9vWXAEZmDKn5Px1WrSbAyXAmNciKmM9XbBSOeD5zYvMM0LxV5/7DxAlwrueiqpADOC5rTGqLDsT6SwvofSs89leHS6QGe4HmniveXn8FjDsAMn+zQvaRMH3NXPuIXWkuKRF8v3BSppDzNR3gGbo6Lyc=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:54.6291945Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=10 HTTP/1.1&quot; 200 1152
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;4&#x27;}, {&#x27;Label&#x27;: &#x27;Timestamp variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Non-numeric variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Numeric variables&#x27;, &#x27;Value&#x27;: &#x27;BatchID, Druck, Temp A, Temp B&#x27;}, {&#x27;Label&#x27;: &#x27;Watch folder&#x27;, &#x27;Value&#x27;: &#x27;C:\\Users\\CONTRERA\\Documents\\Files\\ASCII UC620203  b3_comma&#x27;}, {&#x27;Label&#x27;: &#x27;Example file:&#x27;, &#x27;Value&#x27;: &#x27;C:\\Users\\CONTRERA\\Documents\\Files\\ASCII UC620203  b3_comma\\Bob 6 Batches_b3_comma.txt&#x27;}, {&#x27;Label&#x27;: &#x27;Use timestamp from file&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Restore strategy&#x27;, &#x27;Value&#x27;: &#x27;None&#x27;}, {&#x27;Label&#x27;: &#x27;Spectra Direction&#x27;, &#x27;Value&#x27;: &#x27;ID_READING_DIRECTION_LEFT_RIGHT&#x27;}, {&#x27;Label&#x27;: &#x27;Use first column as sample information&#x27;, &#x27;Value&#x27;: &#x27;True&#x27;}, {&#x27;Label&#x27;: &#x27;Use first row as header&#x27;, &#x27;Value&#x27;: &#x27;True&#x27;}, {&#x27;Label&#x27;: &#x27;Skip rows&#x27;, &#x27;Value&#x27;: &#x27;0&#x27;}, {&#x27;Label&#x27;: &#x27;Skip cols&#x27;, &#x27;Value&#x27;: &#x27;0&#x27;}, {&#x27;Label&#x27;: &#x27;Treat multiple-line file as one sample&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Separator&#x27;, &#x27;Value&#x27;: &#x27;,&#x27;}, {&#x27;Label&#x27;: &#x27;Decimal Separator&#x27;, &#x27;Value&#x27;: &#x27;.&#x27;}, {&#x27;Label&#x27;: &#x27;Process double quotes&#x27;, &#x27;Value&#x27;: &#x27;True&#x27;}, {&#x27;Label&#x27;: &#x27;Treat consecutive separators as one&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Transpose data&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Date/Time format:&#x27;, &#x27;Value&#x27;: &#x27;yyyy-MM-dd HH:mm:ss&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_Eigen</td>
+          <td class="col-duration">0.18</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:402 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_Eigen
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;x7LQRe7DI9Sm8l6/AAKyDnNt2J5QZHQ+wPyrXel83PEH15J9UlWzTQkCpdAM7Kd6U1PYWFUvs1dxhW6EkUTStmLi7oFlFp4NYJtQEdacEVqe7tq4EHj+TkyR+kH6qu4zVO9BZewZHYBySGCWhM2fVEM5CuFL0h5lORHOckBEaAVzadYlRgVwRo2bU4P3+lSfkGm+iJywx54az8tqvDMtEBbZHVBrSpVtysthA0tfino=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:54.8121857Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=9 HTTP/1.1&quot; 200 496
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;2048&#x27;}, {&#x27;Label&#x27;: &#x27;First X&#x27;, &#x27;Value&#x27;: &#x27;190.12712097168&#x27;}, {&#x27;Label&#x27;: &#x27;Last X&#x27;, &#x27;Value&#x27;: &#x27;3467.24243164063&#x27;}, {&#x27;Label&#x27;: &#x27;Watch folder&#x27;, &#x27;Value&#x27;: &#x27;C:\\Users\\CONTRERA\\Documents\\Models\\Eagen\\data&#x27;}, {&#x27;Label&#x27;: &#x27;Example file:&#x27;, &#x27;Value&#x27;: &#x27;C:\\Users\\CONTRERA\\Documents\\Models\\Eagen\\data\\PDLD_ 02.spc&#x27;}, {&#x27;Label&#x27;: &#x27;Use timestamp from file&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Restore strategy&#x27;, &#x27;Value&#x27;: &#x27;None&#x27;}, {&#x27;Label&#x27;: &#x27;Spectra Direction&#x27;, &#x27;Value&#x27;: &#x27;ID_READING_DIRECTION_LEFT_RIGHT&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_Empower</td>
+          <td class="col-duration">0.18</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:382 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_Empower
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;It0/yTwEEXbHxk9v/CO8Hz/CwKyhJp03D8uHy6rxEs9dBTymomED1t+UfZByrP3s53h7xlcaNVHKuUGIP/yihgGohCEnRec/OFk+CELyi+hWBE/PHc9W9XPS6d9jhu2XNu0yzxrBDbHQYd0eb3ttFZh4yX3NAqnTFNd8bZlKaVgGOA76z0IdXJZRF6MMqWC53Tv2nxSFez0PHhXUUXMM6UpDMOJ6noaEft+Yf039EoI=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:54.9971913Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=7 HTTP/1.1&quot; 200 808
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;8&#x27;}, {&#x27;Label&#x27;: &#x27;Timestamp variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Non-numeric variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Numeric variables&#x27;, &#x27;Value&#x27;: &#x27;TestPeak - RetentionTime, TestPeak2 - RetentionTime, TestPeak - Area, TestPeak2 - Area, TestPeak - AreaPercentage, TestPeak2 - AreaPercentage, TestPeak - Height, TestPeak2 - Height&#x27;}, {&#x27;Label&#x27;: &#x27;Watch folder&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\Empower\\Watch&#x27;}, {&#x27;Label&#x27;: &#x27;Example file:&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\Empower\\Input\\Full_Version.xml&#x27;}, {&#x27;Label&#x27;: &#x27;Use timestamp from file&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Restore strategy&#x27;, &#x27;Value&#x27;: &#x27;None&#x27;}, {&#x27;Label&#x27;: &#x27;Spectra Direction&#x27;, &#x27;Value&#x27;: &#x27;ID_READING_DIRECTION_LEFT_RIGHT&#x27;}, {&#x27;Label&#x27;: &#x27;Tag&#x27;, &#x27;Value&#x27;: &#x27;RetentionTime, Area, AreaPercentage, Height&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_GRAMS</td>
+          <td class="col-duration">0.17</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:332 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_GRAMS
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;7S4PYpvc8VaPGx2eyN/rAi7688frhT5NIUDNdENyAIn3qlQW2GIKZa6f92+OzSSZKaFnZFoLaNQeDquCbmEIdUSef3bPP5cThHuHsbZ+SvRTrOY6PIURGezlttKajAWdwxrssywlEbHipk4FozqKsCTB3IQNnH24qFFbIlBj2Oqg8SMtfvGe+ogWSg/EubCCnzo+uiGmZQhooYETHDv2l1C2zCxATM9hTJtJ8eQssEo=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:55.1731863Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=2 HTTP/1.1&quot; 200 517
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;11550&#x27;}, {&#x27;Label&#x27;: &#x27;First X&#x27;, &#x27;Value&#x27;: &#x27;139.800003051758&#x27;}, {&#x27;Label&#x27;: &#x27;Last X&#x27;, &#x27;Value&#x27;: &#x27;3604.50024414063&#x27;}, {&#x27;Label&#x27;: &#x27;Watch folder&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\GRAMS\\Watch&#x27;}, {&#x27;Label&#x27;: &#x27;Example file:&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\GRAMS\\Input\\Test_Raman_000001.spc&#x27;}, {&#x27;Label&#x27;: &#x27;Use timestamp from file&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Restore strategy&#x27;, &#x27;Value&#x27;: &#x27;None&#x27;}, {&#x27;Label&#x27;: &#x27;Spectra Direction&#x27;, &#x27;Value&#x27;: &#x27;ID_READING_DIRECTION_LEFT_RIGHT&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_Image</td>
+          <td class="col-duration">0.17</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:372 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_Image
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;ZW7iQlO3GJYAT4Zni1Hy29nW/YxyZNhGnd2tQKoggD4sYlsASQmWuFdJhlg6JYhoVfQ6Vle/FKU0claaT1CFALbQZ5PYYgH/Ux9bQlAeJQeb1DSgA80nw9lwc9yN155W1hH85so2Xl7MQXQrEQnrzCTxd269urg1uXf4cUyWSlcIuYkrVo5kmy8j4qmeI2MjicmjBTFIChSR0k2ZyY/TLwcPRa8PhTjK3qrmUymqHww=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:55.3651993Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=6 HTTP/1.1&quot; 200 633
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;0&#x27;}, {&#x27;Label&#x27;: &#x27;Timestamp variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Non-numeric variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Numeric variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Watch folder&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\Image\\Watch&#x27;}, {&#x27;Label&#x27;: &#x27;Example file:&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\Image\\Input\\1.JPG&#x27;}, {&#x27;Label&#x27;: &#x27;Use timestamp from file&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Restore strategy&#x27;, &#x27;Value&#x27;: &#x27;None&#x27;}, {&#x27;Label&#x27;: &#x27;Spectra Direction&#x27;, &#x27;Value&#x27;: &#x27;ID_READING_DIRECTION_LEFT_RIGHT&#x27;}, {&#x27;Label&#x27;: &#x27;Polling&#x27;, &#x27;Value&#x27;: &#x27;True&#x27;}, {&#x27;Label&#x27;: &#x27;Polling period&#x27;, &#x27;Value&#x27;: &#x27;5 ID_SECONDS&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_JCAMPDX</td>
+          <td class="col-duration">0.18</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:342 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_JCAMPDX
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;EMHhNhSl/+Ow0ytGr2aiTvg7okvZLza+5FQszz/R1u74EvhDAA3umYgA0Q2TLFtTGcQ+XtYbGaFqlW3xyHEjDRukmSEDdljIA1qDDLRDtOYwaU4jBPfoi7vvRJMr8EyKx2TfxpDpPT1qN2oobVkBckfA3+Z3rI7EJupf05UDqlhFzxClWJiSnQefQGkGl4LKa5cnOSIA3gThTBekNo+uDB1zqwOsX6hUGtp8Xzl3/s4=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:55.6541978Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=3 HTTP/1.1&quot; 200 511
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;3736&#x27;}, {&#x27;Label&#x27;: &#x27;First X&#x27;, &#x27;Value&#x27;: &#x27;399.263977050781&#x27;}, {&#x27;Label&#x27;: &#x27;Last X&#x27;, &#x27;Value&#x27;: &#x27;4001.3193359375&#x27;}, {&#x27;Label&#x27;: &#x27;Watch folder&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\JCAMP-DX\\Watch&#x27;}, {&#x27;Label&#x27;: &#x27;Example file:&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\JCAMP-DX\\Input\\fixinc1.jdx&#x27;}, {&#x27;Label&#x27;: &#x27;Use timestamp from file&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Restore strategy&#x27;, &#x27;Value&#x27;: &#x27;None&#x27;}, {&#x27;Label&#x27;: &#x27;Spectra Direction&#x27;, &#x27;Value&#x27;: &#x27;ID_READING_DIRECTION_LEFT_RIGHT&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_OPUS</td>
+          <td class="col-duration">0.20</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:352 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_OPUS
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;FSgVB50PLpyOM9ku6KYP00WMNdEOsIAqOD1ORkp6cDh4YkqX5BMtCirsmCRO4j9bYKLF/2NrMaZhIG8Ee3sBX17fj5+P3gnyKtLRvXKTMU6TYL+NDNGfaC/goh3aACBYSR65OOnmffobjQeM/9Z4TaSnUacLHKV67Y7yXhEmNPD47QDnsPvTa8Jkitd0GenUpT6wmI5DmM8c0bkfEMp+F3DONhp2kzS1TmxfqJRTKHc=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:55.9391901Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=4 HTTP/1.1&quot; 200 505
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;1154&#x27;}, {&#x27;Label&#x27;: &#x27;First X&#x27;, &#x27;Value&#x27;: &#x27;12489.578125&#x27;}, {&#x27;Label&#x27;: &#x27;Last X&#x27;, &#x27;Value&#x27;: &#x27;3594.90014648438&#x27;}, {&#x27;Label&#x27;: &#x27;Watch folder&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\OPUS\\Watch&#x27;}, {&#x27;Label&#x27;: &#x27;Example file:&#x27;, &#x27;Value&#x27;: &#x27;C:\\Camo\\CAMO\\CAMO\\UPP_Validation\\Data\\OPUS\\Input\\3310940016_9-1.0&#x27;}, {&#x27;Label&#x27;: &#x27;Use timestamp from file&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Restore strategy&#x27;, &#x27;Value&#x27;: &#x27;None&#x27;}, {&#x27;Label&#x27;: &#x27;Spectra Direction&#x27;, &#x27;Value&#x27;: &#x27;ID_READING_DIRECTION_LEFT_RIGHT&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_PI</td>
+          <td class="col-duration">0.18</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:392 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_PI
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;+nxUTw34KgVpWx/8+Z15lNE5DdXWMN/elj4UwdDRgXUMM87xTedkzMY7qkGL5zwk8B9eZx6Jb1fFmuDYXPV6IIcgTN9KHWPJ205ChnHrZmZDgT6KSzmELP+5vjwl+ovfQI4HB457skRs34mTt8OQxIA4KXptcfUmDPelrkKwLEIAaQqWDvRCORQQYd51FApS17z+aVXGPe6hbGFfzVgMi/pUIJDYysI8j5sJyeJuzzs=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:56.1361956Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=8 HTTP/1.1&quot; 200 576
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;12&#x27;}, {&#x27;Label&#x27;: &#x27;Timestamp variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Non-numeric variables&#x27;, &#x27;Value&#x27;: &#x27;ID_NA&#x27;}, {&#x27;Label&#x27;: &#x27;Numeric variables&#x27;, &#x27;Value&#x27;: &#x27;WriteTag_6203, WriteTag_6204, WriteTag_6205, WriteTag_6206, WriteTag_6207, WriteTag_6208, WriteTag_6209, WriteTag_6210, WriteTag_6211, WriteTag_6212, WriteTag_6213, WriteTag_6214&#x27;}, {&#x27;Label&#x27;: &#x27;Server&#x27;, &#x27;Value&#x27;: &#x27;10.16.51.34&#x27;}, {&#x27;Label&#x27;: &#x27;Polling&#x27;, &#x27;Value&#x27;: &#x27;True&#x27;}, {&#x27;Label&#x27;: &#x27;Polling period&#x27;, &#x27;Value&#x27;: &#x27;5 ID_SECONDS&#x27;}, {&#x27;Label&#x27;: &#x27;Load missing samples&#x27;, &#x27;Value&#x27;: &#x27;False&#x27;}, {&#x27;Label&#x27;: &#x27;Version&#x27;, &#x27;Value&#x27;: &#x27;ID_PISDK&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveDataSourceMetadatabyDataSourceRevisionID_ZEISS</td>
+          <td class="col-duration">0.23</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:362 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveDataSourceMetadatabyDataSourceRevisionID_ZEISS
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;bFPMyBbdJ4SvwgSppQoKpUBMtiygKJWNUkk3afb6TMuKHIAFx01LXvHIsHx4tkx6caSSSuDzdWb/6mtDazgGvCKT5DJGcyknZDzR8MuXbXhC/6gw0r8bsHXgdLESv+mG1MMpR273O6kE7jCFdI3Qr5XkMXRbe/IzhvZgX241Q9o+Ir8XRdW1UtBq3P7GQ4ieis4ZHnxIKUtnpU+r6TrPlWefJiIcoG/kQJiQadDKCq0=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:56.3351931Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/datasource/metadata?datasourceRevisionId=5 HTTP/1.1&quot; 200 370
+[35mDEBUG   [0m root:requests.py:121 File Created
+[35mDEBUG   [0m root:requests.py:122 [{&#x27;Label&#x27;: &#x27;Variables count&#x27;, &#x27;Value&#x27;: &#x27;821&#x27;}, {&#x27;Label&#x27;: &#x27;First X&#x27;, &#x27;Value&#x27;: &#x27;210&#x27;}, {&#x27;Label&#x27;: &#x27;Last X&#x27;, &#x27;Value&#x27;: &#x27;620&#x27;}, {&#x27;Label&#x27;: &#x27;Selected Instrument&#x27;, &#x27;Value&#x27;: &#x27;UV-DB with CLD&#x27;}, {&#x27;Label&#x27;: &#x27;Integration time&#x27;, &#x27;Value&#x27;: &#x27;0.2,0.2&#x27;}, {&#x27;Label&#x27;: &#x27;Scans to average&#x27;, &#x27;Value&#x27;: &#x27;1,1&#x27;}, {&#x27;Label&#x27;: &#x27;Scan intervals&#x27;, &#x27;Value&#x27;: &#x27;5000&#x27;}, {&#x27;Label&#x27;: &#x27;Spectrum type&#x27;, &#x27;Value&#x27;: &#x27;ID_DS_ZEISS_DEFINEPARAMETERS_12&#x27;}]<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveListOfConfigurationRuns</td>
+          <td class="col-duration">0.09</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:168 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveListOfConfigurationRuns
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;cahKrNqV+q1xOBpihAD5UwqZfA4FoHfOyWvLqCsNYK638cNbHdXBkl2Kzt+r0XIeWYzGCv74aXGDU5DsW9eF6Tp6nHGqIkOF1Lwc015YIrNJUhBC6szTBDLVu3gQRR7HiK1tuIVLpoqvR74wOS/w+Kr1BLhS97uMVN1goHRRbgD/lqoNa8NilrEWm3RvTTK3WuUQLswzz20zqLbZPYLpNf8OTG9neKcttB/hYfDE+/s=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:56.5511973Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/GetConfigurationRunMetadataByRunID?runID=31 HTTP/1.1&quot; 200 2519
+[35mDEBUG   [0m root:requests.py:58 File Created
+[35mDEBUG   [0m root:requests.py:59 {&#x27;BasicInfo&#x27;: {&#x27;RunID&#x27;: 31, &#x27;ConfigurationID&#x27;: 12, &#x27;Name&#x27;: &#x27;ConfigFases&#x27;, &#x27;RevisionID&#x27;: 16, &#x27;StartTime&#x27;: &#x27;2022-08-22T21:14:09.8540549Z&#x27;, &#x27;StopTime&#x27;: &#x27;2022-08-22T21:16:24.2616408Z&#x27;}, &#x27;FlagInfo&#x27;: [{&#x27;Flag&#x27;: &#x27;Configuration started&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T21:14:35.0366667&#x27;}, {&#x27;Flag&#x27;: &#x27;Flag2&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T21:16:10.0433333&#x27;}, {&#x27;Flag&#x27;: &#x27;Configuration stopped&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T21:16:24.24&#x27;}], &#x27;CommentInfo&#x27;: [{&#x27;Comment&#x27;: &#x27;This is a comment i need&#x27;}], &#x27;NotificationInfo&#x27;: [{&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 372, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:34.9307282&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 372, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:34.9307282&#x27;}, &#x27;Count&#x27;: 1, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;Nueva warning&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 372, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:34.9307282&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 401, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:37.1601481&#x27;}, &#x27;Count&#x27;: 21, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;NuevaAlarma&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 372, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:34.9307282&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 401, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:37.1601481&#x27;}, &#x27;Count&#x27;: 30, &#x27;VariableName&#x27;: &#x27;Q Residuals&#x27;, &#x27;Notification&#x27;: &#x27;Sample outside 95% Q Residuals limit&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 379, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:36.3427684&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 382, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:52.5562048&#x27;}, &#x27;Count&#x27;: 3, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;Nueva warning&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 379, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:36.3427684&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 379, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:36.3427684&#x27;}, &#x27;Count&#x27;: 1, &#x27;VariableName&#x27;: &#x27;F Residuals&#x27;, &#x27;Notification&#x27;: &#x27;Sample outside 95% F Residuals limit&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 389, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:53.9961043&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 392, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:35.3250533&#x27;}, &#x27;Count&#x27;: 3, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;Nueva warning&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 389, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:53.9961043&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 389, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:53.9961043&#x27;}, &#x27;Count&#x27;: 1, &#x27;VariableName&#x27;: &#x27;F Residuals&#x27;, &#x27;Notification&#x27;: &#x27;Sample outside 95% F Residuals limit&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 399, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:36.7499064&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 400, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:36.9537703&#x27;}, &#x27;Count&#x27;: 2, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;Nueva warning&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 399, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:36.7499064&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 399, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:36.7499064&#x27;}, &#x27;Count&#x27;: 1, &#x27;VariableName&#x27;: &#x27;F Residuals&#x27;, &#x27;Notification&#x27;: &#x27;Sample outside 95% F Residuals limit&#x27;}]}<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveListOfTags</td>
+          <td class="col-duration">0.12</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:612 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveListOfTags
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[Tag] WHERE Type = &#x27;1&#x27; ;
+[35mDEBUG   [0m root:test_MVA.py:619 [{&#x27;ID&#x27;: 1, &#x27;Type&#x27;: 1, &#x27;Definition&#x27;: 1, &#x27;Label&#x27;: &#x27;Project Name&#x27;, &#x27;DataType&#x27;: 0, &#x27;Entries&#x27;: None, &#x27;IsCompulsory&#x27;: False, &#x27;Disable&#x27;: False, &#x27;IsDefault&#x27;: True}, {&#x27;ID&#x27;: 2, &#x27;Type&#x27;: 1, &#x27;Definition&#x27;: 2, &#x27;Label&#x27;: &#x27;Product&#x27;, &#x27;DataType&#x27;: 0, &#x27;Entries&#x27;: None, &#x27;IsCompulsory&#x27;: True, &#x27;Disable&#x27;: False, &#x27;IsDefault&#x27;: True}, {&#x27;ID&#x27;: 3, &#x27;Type&#x27;: 1, &#x27;Definition&#x27;: 3, &#x27;Label&#x27;: &#x27;Experiment ID&#x27;, &#x27;DataType&#x27;: 0, &#x27;Entries&#x27;: None, &#x27;IsCompulsory&#x27;: True, &#x27;Disable&#x27;: False, &#x27;IsDefault&#x27;: True}, {&#x27;ID&#x27;: 6, &#x27;Type&#x27;: 1, &#x27;Definition&#x27;: 0, &#x27;Label&#x27;: &#x27;Tag1&#x27;, &#x27;DataType&#x27;: 0, &#x27;Entries&#x27;: None, &#x27;IsCompulsory&#x27;: False, &#x27;Disable&#x27;: False, &#x27;IsDefault&#x27;: True}, {&#x27;ID&#x27;: 7, &#x27;Type&#x27;: 1, &#x27;Definition&#x27;: 0, &#x27;Label&#x27;: &#x27;Tag2&#x27;, &#x27;DataType&#x27;: 0, &#x27;Entries&#x27;: None, &#x27;IsCompulsory&#x27;: False, &#x27;Disable&#x27;: False, &#x27;IsDefault&#x27;: True}, {&#x27;ID&#x27;: 8, &#x27;Type&#x27;: 1, &#x27;Definition&#x27;: 0, &#x27;Label&#x27;: &#x27;Tag3&#x27;, &#x27;DataType&#x27;: 0, &#x27;Entries&#x27;: None, &#x27;IsCompulsory&#x27;: False, &#x27;Disable&#x27;: False, &#x27;IsDefault&#x27;: True}, {&#x27;ID&#x27;: 9, &#x27;Type&#x27;: 1, &#x27;Definition&#x27;: 0, &#x27;Label&#x27;: &#x27;Tag4&#x27;, &#x27;DataType&#x27;: 0, &#x27;Entries&#x27;: None, &#x27;IsCompulsory&#x27;: False, &#x27;Disable&#x27;: False, &#x27;IsDefault&#x27;: True}, {&#x27;ID&#x27;: 10, &#x27;Type&#x27;: 1, &#x27;Definition&#x27;: 0, &#x27;Label&#x27;: &#x27;Tag5&#x27;, &#x27;DataType&#x27;: 0, &#x27;Entries&#x27;: None, &#x27;IsCompulsory&#x27;: False, &#x27;Disable&#x27;: False, &#x27;IsDefault&#x27;: True}]
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;FxS5gtH2ROw6yMxJzE9+Yzm0BckYa1olP/hFZcNsjZlH35Cc3g72AKaqXiFMqslcPbx682vsVxcS/mR+BAbY6JWOIBgJEbQ/u8Qy0yP7VtZP4VLu5RiuBTfZxdk628IlpQuJEgY9c5gwDAduhj2lkzFGaHuFJqxXdw6cYOtEw1faakq71SVpuZxSqJI1XkcsGizF+gS2fimX7svkxXRE0GlZKpQfibkLanUbTbwAyiQ=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:57.1031952Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/configuration/GetTagInformation?label= HTTP/1.1&quot; 200 80
+[35mDEBUG   [0m root:requests.py:148 File Created
+[35mDEBUG   [0m root:requests.py:149 [&#x27;Experiment ID&#x27;, &#x27;Product&#x27;, &#x27;Project Name&#x27;, &#x27;Tag1&#x27;, &#x27;Tag2&#x27;, &#x27;Tag3&#x27;, &#x27;Tag4&#x27;, &#x27;Tag5&#x27;]
+[35mDEBUG   [0m root:test_MVA.py:628 Project Name
+[35mDEBUG   [0m root:test_MVA.py:628 Product
+[35mDEBUG   [0m root:test_MVA.py:628 Experiment ID
+[35mDEBUG   [0m root:test_MVA.py:628 Tag1
+[35mDEBUG   [0m root:test_MVA.py:628 Tag2
+[35mDEBUG   [0m root:test_MVA.py:628 Tag3
+[35mDEBUG   [0m root:test_MVA.py:628 Tag4
+[35mDEBUG   [0m root:test_MVA.py:628 Tag5<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveMetaInformationforConfigurationRuns</td>
+          <td class="col-duration">0.18</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:504 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveMetaInformationforConfigurationRuns
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;OLe0iZNltlkPraSsTUCpjAWMTZ/w7t+b7owj1cB20ffdY/WREqUqM+tPcSAWieMkJpW7EXqDMp0b3/vVjCjbFaDIcLrB8dKg+XlYwIQ9YrGHbnhB3+c2lbkaDRpDK2A0tl7F1cQdxIH1kUg+6vPR4bjCRb/7Kcm7hwB3seY27znCHgk3gznOH/kRol7dc+tEXnt8jnscg/ng4K0fxJ8gOyU7sdpBDfKwKPVS24mFTbw=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:57.1852014Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/Configuration/GetConfigurationRunMetadataByRunID?runID=31 HTTP/1.1&quot; 200 2519
+[35mDEBUG   [0m root:requests.py:137 File Created
+[35mDEBUG   [0m root:requests.py:138 {&#x27;BasicInfo&#x27;: {&#x27;RunID&#x27;: 31, &#x27;ConfigurationID&#x27;: 12, &#x27;Name&#x27;: &#x27;ConfigFases&#x27;, &#x27;RevisionID&#x27;: 16, &#x27;StartTime&#x27;: &#x27;2022-08-22T21:14:09.8540549Z&#x27;, &#x27;StopTime&#x27;: &#x27;2022-08-22T21:16:24.2616408Z&#x27;}, &#x27;FlagInfo&#x27;: [{&#x27;Flag&#x27;: &#x27;Configuration started&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T21:14:35.0366667&#x27;}, {&#x27;Flag&#x27;: &#x27;Flag2&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T21:16:10.0433333&#x27;}, {&#x27;Flag&#x27;: &#x27;Configuration stopped&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T21:16:24.24&#x27;}], &#x27;CommentInfo&#x27;: [{&#x27;Comment&#x27;: &#x27;This is a comment i need&#x27;}], &#x27;NotificationInfo&#x27;: [{&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 372, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:34.9307282&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 372, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:34.9307282&#x27;}, &#x27;Count&#x27;: 1, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;Nueva warning&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 372, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:34.9307282&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 401, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:37.1601481&#x27;}, &#x27;Count&#x27;: 21, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;NuevaAlarma&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 372, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:34.9307282&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 401, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:37.1601481&#x27;}, &#x27;Count&#x27;: 30, &#x27;VariableName&#x27;: &#x27;Q Residuals&#x27;, &#x27;Notification&#x27;: &#x27;Sample outside 95% Q Residuals limit&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 379, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:36.3427684&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 382, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:52.5562048&#x27;}, &#x27;Count&#x27;: 3, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;Nueva warning&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 379, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:36.3427684&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 379, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:36.3427684&#x27;}, &#x27;Count&#x27;: 1, &#x27;VariableName&#x27;: &#x27;F Residuals&#x27;, &#x27;Notification&#x27;: &#x27;Sample outside 95% F Residuals limit&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 389, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:53.9961043&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 392, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:35.3250533&#x27;}, &#x27;Count&#x27;: 3, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;Nueva warning&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 389, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:53.9961043&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 389, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:14:53.9961043&#x27;}, &#x27;Count&#x27;: 1, &#x27;VariableName&#x27;: &#x27;F Residuals&#x27;, &#x27;Notification&#x27;: &#x27;Sample outside 95% F Residuals limit&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 399, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:36.7499064&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 400, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:36.9537703&#x27;}, &#x27;Count&#x27;: 2, &#x27;VariableName&#x27;: &#x27;Raw Data&#x27;, &#x27;Notification&#x27;: &#x27;Nueva warning&#x27;}, {&#x27;FirstSample&#x27;: {&#x27;SampleID&#x27;: 399, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:36.7499064&#x27;}, &#x27;LastSample&#x27;: {&#x27;SampleID&#x27;: 399, &#x27;SampleTime&#x27;: &#x27;2022-08-22T21:15:36.7499064&#x27;}, &#x27;Count&#x27;: 1, &#x27;VariableName&#x27;: &#x27;F Residuals&#x27;, &#x27;Notification&#x27;: &#x27;Sample outside 95% F Residuals limit&#x27;}]}
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[DataMaster] ;
+[35mDEBUG   [0m root:test_MVA.py:515 [&#x27;BasicInfo&#x27;, &#x27;FlagInfo&#x27;, &#x27;CommentInfo&#x27;, &#x27;NotificationInfo&#x27;]
+[35mDEBUG   [0m root:test_MVA.py:521 [&#x27;RunID&#x27;, &#x27;ConfigurationID&#x27;, &#x27;Name&#x27;, &#x27;RevisionID&#x27;, &#x27;StartTime&#x27;, &#x27;StopTime&#x27;]
+[35mDEBUG   [0m root:test_MVA.py:526 16
+[35mDEBUG   [0m root:test_MVA.py:528 16
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[ConfigurationRevision] WHERE RevisionID = &#x27;16&#x27; ;
+[35mDEBUG   [0m root:test_MVA.py:533 12
+[35mDEBUG   [0m root:test_MVA.py:535 12
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[Configurations] WHERE config_id = &#x27;12&#x27; ;
+[35mDEBUG   [0m root:test_MVA.py:540 ConfigFases
+[35mDEBUG   [0m root:test_MVA.py:542 ConfigFases
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[DataMaster] WHERE ID = &#x27;31&#x27; ;
+[35mDEBUG   [0m root:test_MVA.py:547 2022-08-22 21:14:09.853000
+[35mDEBUG   [0m root:test_MVA.py:549 2022-08-22T21:14:09.8540549Z
+[35mDEBUG   [0m root:test_MVA.py:555 2022-08-22T21:16:24.2616408Z
+[35mDEBUG   [0m root:test_MVA.py:557 2022-08-22 21:16:24.260000
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[ResultFlag] WHERE DataMasterID = &#x27;31&#x27; ;
+[35mDEBUG   [0m root:test_MVA.py:565 [{&#x27;Flag&#x27;: &#x27;Configuration started&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T21:14:35.0366667&#x27;}, {&#x27;Flag&#x27;: &#x27;Flag2&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T21:16:10.0433333&#x27;}, {&#x27;Flag&#x27;: &#x27;Configuration stopped&#x27;, &#x27;CreatedDate&#x27;: &#x27;2022-08-22T21:16:24.24&#x27;}]
+[35mDEBUG   [0m root:test_MVA.py:566 [{&#x27;ID&#x27;: 59, &#x27;ResultID&#x27;: 552, &#x27;DataMasterID&#x27;: 31, &#x27;FlagID&#x27;: 1, &#x27;CreatedBy&#x27;: None, &#x27;CreatedDate&#x27;: datetime.datetime(2022, 8, 22, 21, 14, 35, 37000)}, {&#x27;ID&#x27;: 60, &#x27;ResultID&#x27;: 573, &#x27;DataMasterID&#x27;: 31, &#x27;FlagID&#x27;: 4, &#x27;CreatedBy&#x27;: 4, &#x27;CreatedDate&#x27;: datetime.datetime(2022, 8, 22, 21, 16, 10, 43000)}, {&#x27;ID&#x27;: 61, &#x27;ResultID&#x27;: 581, &#x27;DataMasterID&#x27;: 31, &#x27;FlagID&#x27;: 2, &#x27;CreatedBy&#x27;: 4, &#x27;CreatedDate&#x27;: datetime.datetime(2022, 8, 22, 21, 16, 24, 240000)}]
+[35mDEBUG   [0m root:test_MVA.py:569 Configuration started
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[Flag] WHERE name = &#x27;Configuration started&#x27; ;
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[ResultFlag] WHERE DataMasterID = &#x27;31&#x27; AND FlagID = &#x27;1&#x27; ;
+[35mDEBUG   [0m root:test_MVA.py:578 2022-08-22 21:14:35.03
+[35mDEBUG   [0m root:test_MVA.py:579 2022-08-22 21:14:35.03
+[35mDEBUG   [0m root:test_MVA.py:569 Flag2
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[Flag] WHERE name = &#x27;Flag2&#x27; ;
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[ResultFlag] WHERE DataMasterID = &#x27;31&#x27; AND FlagID = &#x27;4&#x27; ;
+[35mDEBUG   [0m root:test_MVA.py:578 2022-08-22 21:16:10.04
+[35mDEBUG   [0m root:test_MVA.py:579 2022-08-22 21:16:10.04
+[35mDEBUG   [0m root:test_MVA.py:569 Configuration stopped
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[Flag] WHERE name = &#x27;Configuration stopped&#x27; ;
+[35mDEBUG   [0m root:dbUtility.py:30 Executing: SELECT * FROM AspenProcessPulse_other.[dbo].[ResultFlag] WHERE DataMasterID = &#x27;31&#x27; AND FlagID = &#x27;2&#x27; ;
+[35mDEBUG   [0m root:test_MVA.py:578 2022-08-22 21:16:24.24
+[35mDEBUG   [0m root:test_MVA.py:579 2022-08-22 21:16:24.24<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveModelMetadatabyModelRevisionID_Batch</td>
+          <td class="col-duration">0.09</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:239 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveModelMetadatabyModelRevisionID_Batch
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;h+Myhc3oiMW2De4g7XQhzolIO9Zlcg06h4Bp81JXHkMx5hFoAlm9QJklvcRZ4VPjaxajRYzTH5PHWvtgs5PhDfjWXU36NMGzZqt+0E4tM3CB71JVJtPobV1g4iZSe/a1pvz3wgGcmKk/RmRQiv3psSM2jTepuLRPseQJR/TbfD5aVvLuWFDb0UQxNCUj9Q5UFFZcGzba10QeNYtiVzcZugl41sAGrwYLPdVm/2p87uI=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:57.3841955Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/model/metadata?modelRevisionId=14 HTTP/1.1&quot; 200 771
+[35mDEBUG   [0m root:requests.py:113 File Created
+[35mDEBUG   [0m root:requests.py:114 {&#x27;Metadata&#x27;: {&#x27;Title&#x27;: &#x27;Linear interpolation&#x27;, &#x27;First Pass model used&#x27;: &#x27;Batch First Pass&#x27;, &#x27;Total number of components&#x27;: &#x27;2&#x27;, &#x27;Optimal number of components&#x27;: &#x27;2&#x27;, &#x27;Raw data used&#x27;: &#x27;&#x27;, &#x27;       Data Matrix used &#x27;: &#x27;Bob 6 Batches&#x27;, &#x27;       Name&#x27;: &#x27;XVar&#x27;, &#x27;       Type&#x27;: &#x27;Non-spectra data &#x27;, &#x27;       Size&#x27;: &#x27;892 samples, 3 variables&#x27;, &#x27;       Sample set&#x27;: &#x27;1-892&#x27;, &#x27;       Variable set&#x27;: &#x27;2-4&#x27;, &#x27;       Samples kept out&#x27;: &#x27;&#x27;, &#x27;       Variables kept out&#x27;: &#x27;&#x27;, &#x27;       Variable weights&#x27;: &#x27;All 1.00/(SDev+0.00)&#x27;, &#x27;Batch variable&#x27;: &#x27;&#x27;, &#x27;       Name &#x27;: &#x27;BatchID&#x27;, &#x27;       Variable set &#x27;: &#x27;1&#x27;, &#x27;       Total batches in data&#x27;: &#x27;6&#x27;, &#x27;       Batches kept out&#x27;: &#x27;&#x27;, &#x27;Grid resolution&#x27;: &#x27;&#x27;, &#x27;       PC1&#x27;: &#x27;10&#x27;, &#x27;       PC2&#x27;: &#x27;2&#x27;, &#x27;Batch coverage&#x27;: &#x27;0.9&#x27;, &#x27;Number of ranges&#x27;: &#x27;20&#x27;, &#x27;Created&#x27;: &#x27;18.11.2016 09&#x27;, &#x27;Computation time&#x27;: &#x27;00&#x27;}}<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveModelMetadatabyModelRevisionID_MCR</td>
+          <td class="col-duration">0.09</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:275 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveModelMetadatabyModelRevisionID_MCR
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;XmA/vUXlo3tFSnpE4DE4Wyj+KJXKzz+YKIauVTaVMA3wXb3xTgLtV5udRzBjwmmXl8r3HSWQLJF+lnD5ZmeMsoCrDy8gNdeQ4wVtYIrnRIw+cK6531gv+yMdwlj3kOJ4/h6UmaUoNvZBwJjKc5bpSI8JVYHeaRJx07tmTSDTpQ6V2/AU/nqH/sV8aggq7Tl/JJHCOS3dfISqOas9rZ3qUmGOm3xHBxYHoGA6oQx7hx8=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:57.5942011Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/model/metadata?modelRevisionId=4 HTTP/1.1&quot; 200 484
+[35mDEBUG   [0m root:requests.py:113 File Created
+[35mDEBUG   [0m root:requests.py:114 {&#x27;Metadata&#x27;: {&#x27;Title&#x27;: &#x27;* Non-negativity (Spectra). &#x27;, &#x27;Optimal number of pure components&#x27;: &#x27;2&#x27;, &#x27;Constraints applied&#x27;: &#x27;&#x27;, &#x27;Sensitivity&#x27;: &#x27;100&#x27;, &#x27;Maximum number of ALS iterations&#x27;: &#x27;50&#x27;, &#x27;Raw data used&#x27;: &#x27;&#x27;, &#x27;  Data Matrix used&#x27;: &#x27;635950600450251168&#x27;, &#x27;  Name&#x27;: &#x27;635950600450251168&#x27;, &#x27;   Type&#x27;: &#x27;Non-spectra data &#x27;, &#x27;  Size&#x27;: &#x27;9 samples, 226 variables&#x27;, &#x27;  Sample set&#x27;: &#x27;1-9&#x27;, &#x27;  Variable set&#x27;: &#x27;1-226&#x27;, &#x27;  Samples kept out&#x27;: &#x27;&#x27;, &#x27;  Variables kept out&#x27;: &#x27;&#x27;, &#x27;Created&#x27;: &#x27;2022-07-05 17&#x27;, &#x27;Computation time&#x27;: &#x27;00&#x27;}}<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveModelMetadatabyModelRevisionID_MLR</td>
+          <td class="col-duration">0.10</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:284 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveModelMetadatabyModelRevisionID_MLR
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;hUN95HQHLXliizpV0zb2aZfJEwn9Aurlo1NhIpwJgTNUryIM1Ad30Bg2ggwXY9LD0Efw/9Av3sbsiRuQ9DO9mBtZNmCKieXofpJpEYoTTnlfPW2GR6sVGrRwSQTWos9qzpvEO6BD7XsEF9rvU9FM5DDw4PHv6TWNNh2BvXCNMMVm/HjF+qm3UQdKsndkUcCqZ9s2bfepLOUWqTQLJ2adZF0v5lRUcZS5O2VeS7cDOOI=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:57.6971977Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/model/metadata?modelRevisionId=5 HTTP/1.1&quot; 200 802
+[35mDEBUG   [0m root:requests.py:113 File Created
+[35mDEBUG   [0m root:requests.py:114 {&#x27;Metadata&#x27;: {&#x27;Title&#x27;: &#x27;Intercept term computed&#x27;, &#x27;Significance level&#x27;: &#x27;0.05&#x27;, &#x27;Validation method&#x27;: &#x27;Leverage&#x27;, &#x27;Raw data used&#x27;: &#x27;&#x27;, &#x27;   X&#x27;: &#x27;&#x27;, &#x27;       Data Matrix used&#x27;: &#x27;635950600450251168&#x27;, &#x27;       Name&#x27;: &#x27;Columnset(3)&#x27;, &#x27;        Type&#x27;: &#x27;Non Spectra data &#x27;, &#x27;       Size&#x27;: &#x27;9 samples, 226 variables&#x27;, &#x27;       Sample set&#x27;: &#x27;1-9&#x27;, &#x27;       Variable set&#x27;: &#x27;1-7&#x27;, &#x27;       Samples kept out&#x27;: &#x27;&#x27;, &#x27;       Variables kept out&#x27;: &#x27;&#x27;, &#x27;       Weights&#x27;: &#x27;All1.00&#x27;, &#x27;   Y&#x27;: &#x27;&#x27;, &#x27;       Data Matrix used &#x27;: &#x27;635950600450251168&#x27;, &#x27;       Name &#x27;: &#x27;635950600450251168&#x27;, &#x27;        Type &#x27;: &#x27;Non Spectra data &#x27;, &#x27;       Size &#x27;: &#x27;9 samples, 226 variables&#x27;, &#x27;       Sample set &#x27;: &#x27;1-9&#x27;, &#x27;       Variable set &#x27;: &#x27;1-226&#x27;, &#x27;       Samples kept out &#x27;: &#x27;&#x27;, &#x27;       Variables kept out &#x27;: &#x27;&#x27;, &#x27;       Weights &#x27;: &#x27;All1.00&#x27;, &#x27;Created&#x27;: &#x27;2022-07-05 17&#x27;, &#x27;Computation time&#x27;: &#x27;00&#x27;}}<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveModelMetadatabyModelRevisionID_PCA</td>
+          <td class="col-duration">0.10</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:257 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveModelMetadatabyModelRevisionID_PCA
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;5Sx22+kayMjXC1xrAUgvVYk2PzQAA+9M6QtaZ925eiQ3pEW165HYlZ1ZZQTn+/F5pruIEQS0GMemfcS4JiCHWez20cgU5M3mN6Gt7GeQXvTS9ggdJd3refM+ul2010xgq/WapF/2CLz+52lxKfQ0buw76O2jMxMCCXPri0TIG/vhljfG5h/3u/2STJjXAkN/2T6yIXNWjBsn5TyR6L4szhBlgXEwX2TEQk+dBdvViD8=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:57.9241986Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/model/metadata?modelRevisionId=1 HTTP/1.1&quot; 200 660
+[35mDEBUG   [0m root:requests.py:113 File Created
+[35mDEBUG   [0m root:requests.py:114 {&#x27;Metadata&#x27;: {&#x27;Title&#x27;: &#x27;Principal Component Analysis (Mean centered)&#x27;, &#x27;Algorithm used&#x27;: &#x27;SVD&#x27;, &#x27;Validation method&#x27;: &#x27;Cross validation&#x27;, &#x27;Cross validation method&#x27;: &#x27;Random with 20 segments &#x27;, &#x27;Total number of components&#x27;: &#x27;5&#x27;, &#x27;Components suggested by model&#x27;: &#x27;5&#x27;, &#x27;Optimal number of components&#x27;: &#x27;5&#x27;, &#x27;Raw data used&#x27;: &#x27;&#x27;, &#x27;       Data Matrix used &#x27;: &#x27;Data Matrix_Normalize_3-8&#x27;, &#x27;       Name&#x27;: &#x27;3-8&#x27;, &#x27;       Type&#x27;: &#x27;Non-spectra data &#x27;, &#x27;       Size&#x27;: &#x27;25 samples, 6 variables&#x27;, &#x27;       Sample set&#x27;: &#x27;1-25&#x27;, &#x27;       Variable set&#x27;: &#x27;3-8&#x27;, &#x27;       Samples kept out&#x27;: &#x27;&#x27;, &#x27;       Variables kept out&#x27;: &#x27;&#x27;, &#x27;       Variable weights&#x27;: &#x27;All1,00&#x27;, &#x27;Created&#x27;: &#x27;2019-07-24 12&#x27;, &#x27;Computation time&#x27;: &#x27;00&#x27;}}<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveModelMetadatabyModelRevisionID_PCR</td>
+          <td class="col-duration">0.10</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:266 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveModelMetadatabyModelRevisionID_PCR
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;oCSqwDOob+rj97cOVqOP8cXDHCmSujZ8rscO+0z+hsYAG59iJm/nhDDDY6I/B5O0zNN8YgCN3RkojuRkpRtJJC7jvAOgb32rKkIAWET9qRv5Sr4wVlU2UW0hMO+eUYgyOA+wYvHyLC/S1xuPvIRVBkTR3R2w5E4nNCRdNRNdXycvB8dOVzo59E37t/Sxft/3weh53YlCUjhunGOtjj2tkhG1B82YVaCmGJEuPfpF1RU=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:58.0271994Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/model/metadata?modelRevisionId=9 HTTP/1.1&quot; 200 1028
+[35mDEBUG   [0m root:requests.py:113 File Created
+[35mDEBUG   [0m root:requests.py:114 {&#x27;Metadata&#x27;: {&#x27;Title&#x27;: &#x27;Principal Component Regression (Mean centered)&#x27;, &#x27;Algorithm used&#x27;: &#x27;SVD&#x27;, &#x27;Validation method&#x27;: &#x27;Cross validation&#x27;, &#x27;Cross validation method&#x27;: &#x27;Full with 9 segments&#x27;, &#x27;Number of Calibration samples used&#x27;: &#x27;9&#x27;, &#x27;Total number of components&#x27;: &#x27;7&#x27;, &#x27;Components suggested by model&#x27;: &#x27;1&#x27;, &#x27;Optimal number of components&#x27;: &#x27;1&#x27;, &#x27;Raw data used&#x27;: &#x27;&#x27;, &#x27;   X&#x27;: &#x27;&#x27;, &#x27;       Data Matrix used&#x27;: &#x27;635950600450251168&#x27;, &#x27;       Name&#x27;: &#x27;635950600450251168&#x27;, &#x27;       Type&#x27;: &#x27;Non-spectra data &#x27;, &#x27;       Size&#x27;: &#x27;9 samples, 226 variables&#x27;, &#x27;       Sample set&#x27;: &#x27;1-9&#x27;, &#x27;       Variable set&#x27;: &#x27;1-226&#x27;, &#x27;       Samples kept out&#x27;: &#x27;&#x27;, &#x27;       Variables kept out&#x27;: &#x27;&#x27;, &#x27;       Weights&#x27;: &#x27;All1.00&#x27;, &#x27;   Y&#x27;: &#x27;&#x27;, &#x27;       Data Matrix used &#x27;: &#x27;635950600450251168&#x27;, &#x27;       Name &#x27;: &#x27;635950600450251168&#x27;, &#x27;       Type &#x27;: &#x27;Non-spectra data &#x27;, &#x27;       Size &#x27;: &#x27;9 samples, 226 variables&#x27;, &#x27;       Sample set &#x27;: &#x27;1-9&#x27;, &#x27;       Variable set &#x27;: &#x27;1-226&#x27;, &#x27;       Samples kept out &#x27;: &#x27;&#x27;, &#x27;       Variables kept out &#x27;: &#x27;&#x27;, &#x27;       Weights &#x27;: &#x27;All1.00&#x27;, &#x27;Created&#x27;: &#x27;2022-07-05 16&#x27;, &#x27;Computation time&#x27;: &#x27;00&#x27;}}<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveModelMetadatabyModelRevisionID_SIMCA</td>
+          <td class="col-duration">0.10</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:293 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveModelMetadatabyModelRevisionID_SIMCA
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;cDhsJmtyvNmj0yuyNcCUXyK0eyJL96xbYlBB0um4Yj2yi0XqyhKQ/t62RqV93GJNVxwU9A9FFueGVl27weQnQEZb/KQoAYLUDuFUZgAzvgRzBuRc6qeqQ8tNcvJUS6gyhVHWQdt4mtqDrzXaLkyjSkyA4qEfpyFYPPEzt2AU2ZSWcNAmIYkPWIM/TRpAr+6j1OxM05cTnlSrlRsWNhSqP+SNFpuPsIG2qQ5qitvxepA=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:58.1292052Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/model/metadata?modelRevisionId=11 HTTP/1.1&quot; 200 399
+[35mDEBUG   [0m root:requests.py:113 File Created
+[35mDEBUG   [0m root:requests.py:114 {&#x27;Metadata&#x27;: {&#x27;Title&#x27;: &#x27;SIMCA classification&#x27;, &#x27;Models used&#x27;: &#x27;&#x27;, &#x27;PCR_FResiduals&#x27;: &#x27;&#x27;, &#x27;       Components used&#x27;: &#x27;1&#x27;, &#x27;       Suggested&#x27;: &#x27;1&#x27;, &#x27;       Max PC/LVs&#x27;: &#x27;7&#x27;, &#x27;Raw data used&#x27;: &#x27;&#x27;, &#x27;X&#x27;: &#x27;&#x27;, &#x27;       Data Matrix used&#x27;: &#x27;X&#x27;, &#x27;       Name&#x27;: &#x27;635950600450251168&#x27;, &#x27;       Size&#x27;: &#x27;9 samples, 226 variables&#x27;, &#x27;       Sample set&#x27;: &#x27;1-9&#x27;, &#x27;       Variable set&#x27;: &#x27;1-226&#x27;, &#x27;Created&#x27;: &#x27;2022-07-05 16&#x27;, &#x27;Computation time&#x27;: &#x27;00&#x27;}}<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_RetrieveModelMetadatabyModelRevisionID_SVR</td>
+          <td class="col-duration">0.09</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:302 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_RetrieveModelMetadatabyModelRevisionID_SVR
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;cVBMq8XddNpGkDA7bTipmaOkip0ZmyILeXIiT4H1WpwpkMpEGRN326DJIDW/n5pTHhEkRw2i+uFtKsY1hE1J4oMAMXgJMfzYzL9zzkpTod5JpP7BbapJ8eQQiFgOwgz7kDoRRTsi0S+B5RxKbosiBtVkovk85t7ZOkpyaa1CwzcPT+RUTOg+xENKThh/xqCx+v4i7IgHuqnEQxEibSjTzt/MY0esAxKn5xYR17/gMvU=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:58.2192028Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/model/metadata?modelRevisionId=12 HTTP/1.1&quot; 200 909
+[35mDEBUG   [0m root:requests.py:113 File Created
+[35mDEBUG   [0m root:requests.py:114 {&#x27;Metadata&#x27;: {&#x27;Title&#x27;: &#x27;Scaled to [-1,1]&#x27;, &#x27;  SVM type&#x27;: &#x27;Regression (epsilon SVR)&#x27;, &#x27;  Kernel type&#x27;: &#x27;Radial basis function&#x27;, &#x27;  Gamma&#x27;: &#x27;0.004424779&#x27;, &#x27;  C value&#x27;: &#x27;1&#x27;, &#x27;  Epsilon value&#x27;: &#x27;0.1&#x27;, &#x27;  Weights&#x27;: &#x27;All1.00&#x27;, &#x27;  Cross validation segment size&#x27;: &#x27;9&#x27;, &#x27;Raw data used&#x27;: &#x27;&#x27;, &#x27;   Descriptors&#x27;: &#x27;&#x27;, &#x27;       Data Matrix used&#x27;: &#x27;635950600450251168&#x27;, &#x27;       Name&#x27;: &#x27;1-226&#x27;, &#x27;        Type&#x27;: &#x27;Non-spectral data &#x27;, &#x27;       Size&#x27;: &#x27;9 samples, 226 variables&#x27;, &#x27;       Sample set&#x27;: &#x27;1-9&#x27;, &#x27;       Variable set&#x27;: &#x27;1-226&#x27;, &#x27;       Samples kept out&#x27;: &#x27;&#x27;, &#x27;       Variables kept out&#x27;: &#x27;&#x27;, &#x27;       Weights&#x27;: &#x27;All1.00&#x27;, &#x27;   Y&#x27;: &#x27;&#x27;, &#x27;       Data Matrix used &#x27;: &#x27;635950600450251168&#x27;, &#x27;       Name &#x27;: &#x27;Columnset(2)&#x27;, &#x27;        Type &#x27;: &#x27;Non-spectral data &#x27;, &#x27;       Size &#x27;: &#x27;9 samples, 1 variables&#x27;, &#x27;       Sample set &#x27;: &#x27;1-9&#x27;, &#x27;       Variable set &#x27;: &#x27;226&#x27;, &#x27;       Samples kept out &#x27;: &#x27;&#x27;, &#x27;       Variables kept out &#x27;: &#x27;&#x27;, &#x27;Created&#x27;: &#x27;2022-07-05 17&#x27;, &#x27;Computation time&#x27;: &#x27;00&#x27;}}<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_ReturnCode401WrongAccessToken</td>
+          <td class="col-duration">0.09</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:199 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_ReturnCode401WrongAccessToken
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;bKjYBnu6tGRVMQFzYrX/SE3HXSOSMz+fdp17Kc3s8vuhCsz8L1rRpGp6/Tez+1Q42/bb9d+PgTIra9U5btqOBtSmWWZsIRcAzAGNRYL6dzN7q61r/m3sTygK38Be/mVJun0r6K3Q5FK0kGf2XJU45wRbTSdm1I76pT6sBCyUq5GMU3BJsPtz9xdTPWi+Q/SlooocNXDyBy5DIJvy+p/YhdDrta5vfwmMNd5aJjoKDoc=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:58.5862052Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/DataSource/List HTTP/1.1&quot; 500 72
+[35mDEBUG   [0m root:requests.py:87 {&#x27;Error&#x27;: {&#x27;Message&#x27;: &#x27;Unauthorized&#x27;, &#x27;Details&#x27;: &#x27;Invalid access token&#x27;}}<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ssqaapitest/test/MVArestAPI/test_MVA.py::TestListElements::test_ReturnCode404</td>
+          <td class="col-duration">0.10</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>[35mDEBUG   [0m root:test_MVA.py:178 ssqaapitest.test.MVArestAPI.test_MVA.TestListElements.test_ReturnCode404
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;POST /AspenProcessPulse/api/auth/LogIn HTTP/1.1&quot; 200 330
+[35mDEBUG   [0m root:requests.py:19 Token created
+[35mDEBUG   [0m root:requests.py:20 {&#x27;AccessToken&#x27;: &#x27;vhrkG8tXEcg2rKzrAfYmc2cH1mnXXYxmUFHkF6UAa1pk8Cf8lm1I9SROAZpnSUQqnzl/xXilLRyQUCaynO9RLGv9BK/uWY0D2WllRxwrclbX7wJ421VzNKvNnkHElj6rSQvxEUT4pBKYtvo419mL8XWph11RrcguiBEpGt76d1rzYNVYEnDrp1Hp9xUnlzcsmuOzRiFI+X8/EDR4UI3he5hy8foJHNA7J1KAbc+4rLo=&#x27;, &#x27;ValidTo&#x27;: &#x27;2022-08-26T01:47:58.9892115Z&#x27;, &#x27;InactivityTimeSpan&#x27;: &#x27;00:30:00&#x27;}
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:232 Starting new HTTP connection (1): 172.22.4.53:9001
+[35mDEBUG   [0m urllib3.connectionpool:connectionpool.py:465 http://172.22.4.53:9001 &quot;GET /AspenProcessPulse/api/DataSource/Listo HTTP/1.1&quot; 404 1747<br/></div></td></tr></tbody></table></body></html>

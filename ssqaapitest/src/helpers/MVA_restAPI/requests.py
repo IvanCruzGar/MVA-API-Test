@@ -141,8 +141,8 @@ class Endpoints(object):
     
 
 
-    def get_ConfigTags(self):
-        api_res = self.requestUtility.get("/configuration/GetTagInformation?label=")
+    def get_ConfigTags(self, Titulo='Tags',LabelName='',expRes=200,empRes=False):
+        api_res = self.requestUtility.get("/configuration/GetTagInformation?label="+LabelName,expected_status_code=expRes,resEmpty=empRes)
         with open('ConfigTagsRetrieve.json', 'w') as f:
             json.dump(api_res, f, indent=2)
             logger.debug('File Created')

@@ -1,3 +1,5 @@
+from cmath import exp
+from fileinput import filename
 import pytest
 import unittest
 import requests
@@ -133,7 +135,7 @@ class TestListElements(unittest.TestCase):
         #Check structure information in the RestAPI response 
         info=list(resAPI[0].keys())
         #logger.debug(info)
-        structure= ['ConfigId', 'ConfigName', 'RevisionNumber', 'ModeldName', 'CreatedDate', 'Status', 'IsEnabled', 'IsApproved']
+        structure= ['ConfigId', 'ConfigName', 'RevisionNumber', 'MethodName', 'CreatedDate', 'Status', 'IsEnabled', 'IsApproved']
         self.assertEqual(info, structure,"Something went wrong")
 
         #Check information of a random Configuration
@@ -578,23 +580,70 @@ class TestListElements(unittest.TestCase):
             logger.debug(date)
             logger.debug(flagAPIdate)
             self.assertEqual(date,flagAPIdate,"Dates dont match")
-
-
+        #Comments retrieval verification start here
+        Parametros = {"DataMasterID":CRID}
+        resDB8 = dbConex.get_DataSet(table = 'ResultComment',dbParams=Parametros)
+        CommentInfo=resAPI['CommentInfo']
+        self.assertEqual(len(CommentInfo),len(resDB8),"Comment size are different")
+        logger.debug(CommentInfo)
+        logger.debug(resDB8)
+        for i in range(len(CommentInfo)):
+            CommentAPI=CommentInfo[i]['Comment']
+            logger.debug(CommentAPI)
+            Parametros = {"Text":CommentAPI}
+            resDB9 = dbConex.get_DataSet(table = 'ResultComment',dbParams=Parametros)
+            self.assertNotEqual([],resDB9,"Comment doesnt exist")
+            date=str(resDB9[0]["CreatedDate"])[0:22]
+            CommentAPIdate=str(CommentInfo[i]['CreatedDate'][0:22]).replace("T"," ")
+            logger.debug(date)
+            logger.debug(CommentAPIdate)
+            self.assertEqual(date,CommentAPIdate,"Dates dont match")
+        #NotificationInfo starts here
+        Parametros = {"DataMasterID":CRID}
+        resDB10 = dbConex.get_DataSet(table = 'ResultNotification',dbParams=Parametros)
+        NotificationInfo=resAPI['NotificationInfo']
+        self.assertEqual(len(NotificationInfo),len(resDB10),"Notification list size are different")
+        logger.debug(NotificationInfo)
+        logger.debug(resDB10)
+        """ for i in range(len(NotificationInfo)):
+            NotificationAPI=NotificationInfo[i]['Notification']
+            logger.debug(NotificationAPI)
+            Parametros = {"name":NotificationAPI}
+            resDB11 = dbConex.get_DataSet(table = 'Notification_Definition',dbParams=Parametros)
+            self.assertNotEqual([],resDB11,"Notification doesnt exist")
+            VariableNotificationAPI=NotificationInfo[i]['VariableName']
+            VariableNotificationDB=resDB11[0]['variable_name']
+            self.assertEqual(VariableNotificationAPI,VariableNotificationDB,"Notification Variable Name is wrong")
+            not_id=resDB11[0]['ID']
+            Parametros = {"name":NotificationAPI}
+            resDB11 = dbConex.get_DataSet(table = 'Notification_Definition',dbParams=Parametros)
+            CountAPI=NotificationInfo[i]['Count']
+            CountDB=resDB11[0]['variable_name']
+            self.assertEqual(VariableNotificationAPI,VariableNotificationDB,"Notification Variable Name is wrong")
+            FlagID=resDB11[0]['flag_id']
+            Parametros = {"DataMasterID":CRID,"FlagID":FlagID}
+            resDB12 = dbConex.get_DataSet(table="ResultFlag",dbParams=Parametros)
+            date=str(resDB12[0]["CreatedDate"])[0:22]
+            flagAPIdate=str(flagInfo[i]['CreatedDate'][0:22]).replace("T"," ")
+            logger.debug(date)
+            logger.debug(flagAPIdate)
+            self.assertEqual(date,flagAPIdate,"Dates dont match") """
 
     @pytest.mark.vsts800106
     def test_RetrievMetaInformationforConfigurationRuns_NonExistingConfigurationRun(self):
         
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_RConfMetaConfId(RevID=200, expRes=204, empRes=True)
+        res = endpoints.get_RetMetaInfoConfRuns(RevID=200, expRes=204, empRes=True)
         self.assertEqual(res, res,"Something went wrong") 
 
     @pytest.mark.vsts800107
     def test_RetrievMetaInformationforConfigurationRuns_InvalidConfigurationRun(self):
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_RConfMetaConfId(RevID=0, expRes=400, empRes=True)
+        res = endpoints.get_RetMetaInfoConfRuns(RevID=0, expRes=400, empRes=True)
         self.assertEqual(res, res,"Something went wrong")  
+
 
     #Use Case 783305: Retrieve configuration runs by metadata tag
 
@@ -604,7 +653,7 @@ class TestListElements(unittest.TestCase):
     
 
 
-    
+    #Use Case 793628: Retrieve tag information
         
     @pytest.mark.vsts793895
     def test_RetrieveListOfTags(self):
@@ -628,4 +677,11 @@ class TestListElements(unittest.TestCase):
             logger.debug(i["Label"])
             self.assertIn(i["Label"],resAPI,"Tag "+i["Label"]+" was not found")
               
+    @pytest.mark.vstsk793915
+    def test_RetrieveTagInformation_EmptyTag(self):
         
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_ConfigTags(RevID=0, expRes=400, empRes=True)
+        self.assertEqual(res, res,"Something went wrong")  
+
