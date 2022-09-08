@@ -1,5 +1,6 @@
 from cmath import exp
 from fileinput import filename
+from xml.etree.ElementTree import ElementTree
 import pytest
 import unittest
 import requests
@@ -205,6 +206,7 @@ class TestListElements(unittest.TestCase):
     
     
     #Use Case 689751: 10. Retrieve Raw Data
+
     @pytest.mark.vsts788343
     def test_RetrieveRawData_ConfigurationRunID(self):
         
@@ -215,18 +217,204 @@ class TestListElements(unittest.TestCase):
         resExp = jsonUtil.read_Json('RawDataID.json')
         self.assertEqual(res, resExp,"Something went wrong")
 
-    @pytest.mark.vsts788347
-    def test_RetrieveRawData_OffsetandRows(self):
+    @pytest.mark.vsts791782
+    def test_RetrieveRawData_ConfigurationRunWithoutRawData(self):
         
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_RDIDOffset(RevID=1,Off=4,Rows=2)
+        res = endpoints.get_RawDataID(RevID=33,Titulo='WithoutRawData',expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+    
+    @pytest.mark.vsts791780
+    def test_RetrieveRawData_InvalidConfigurationRunID(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RawDataID(RevID=0,Titulo='InvalidConfigurationRUn',expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts791781
+    def test_RetrieveRawData_NonExistingConfigurationRun(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RawDataID(RevID=200,Titulo='NonexistingConfigurationRUn',expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts797976
+    def test_RetrieveRawData_LastNRows(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RawDataLastNRows(RevID=1,Rows=3)
         jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('RawDataIDOffset.json')
+        resExp = jsonUtil.read_Json('RawDataIDLastNRows.json')
         self.assertEqual(res, resExp,"Something went wrong")
+    
+    @pytest.mark.vsts797978
+    def test_RetrieveRawData_LastNRowsInvalidNumberOfRows(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RawDataLastNRows(RevID=1,Rows=0,expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts788347
+    def test_RetrieveRawData_OffsetAndRows(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDIDOffset(RevID=1,Rows=2,Off=4)
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataIDOffsetandRows.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts791778
+    def test_RetrieveRawData_OffsetAndRows_IncorrectQuery(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDIDOffset(RevID=1,Rows=5,Off=0,Titulo='IncorrectQuery',expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts791775
+    def test_RetrieveRawData_OffsetAndRows_LowerLimit(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDIDOffset(RevID=1,Rows=3,Off=1,Titulo='LowerLimit')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataIDOffsetandRowsLowerLimit.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts791779
+    def test_RetrieveRawData_OffsetAndRows_RequestRowsoutOfLimits(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDIDOffset(RevID=1,Rows=5,Off=11,Titulo='OutofLimits',expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts791777
+    def test_RetrieveRawData_OffsetAndRows_UpperLimit(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDIDOffset(RevID=1,Rows=1,Off=10,Titulo='UpperLimit')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataIDOffsetandRowsUpperLimit.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792162
+    def test_RetrieveRawData_OffsetAndRows_RawDataPartiallyOutOfScope(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDIDOffset(RevID=1,Rows=5,Off=10,Titulo='PartiallyOutOfScope')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataIDOffsetandRowsPartiallyOutOfScope.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts797965
+    def test_RetrieveRawData_Recent_NonexistingDataforSelectedTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDRecent(RevID=1,Time=5,Titulo='NonexistingDataforSelectedTime',expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts797975
+    def test_RetrieveRawData_Recent_NotValidRecentTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDRecent(RevID=1,Time=-1,Titulo='NotValidRecentTime',expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts797778
+    def test_RetrieveRawData_StartandStopTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDStartStopTime(RevID=1,Start="2022-07-06 16:30:32.7003273",Stop="2022-07-06 16:33:11.1126355")
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataStartStopTime.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts797793
+    def test_RetrieveRawData_StartandStopTime_NoConfigurationRunExistsWithSpecifiedStopTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDStartStopTime(RevID=1,Start="2022-07-06 16:30:32.7003273",Stop="2022-07-06 17:30:12.13",expRes=204,empRes=True,Titulo="NoconfigurationExistswithspecifeidstoptime")
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts797792
+    def test_RetrieveRawData_StartandStopTime_NoConfigurationRunExistsWithSpecifiedStartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDStartStopTime(RevID=1,Start="2022-07-06 15:20:16.30",Stop="2022-07-06 16:33:11.1126355",expRes=204,empRes=True,Titulo="NoconfigurationExistswithspecifeidsarttime")
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts797931
+    def test_RetrieveRawData_StartandStopTime_NotvalidStartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDStartStopTime(RevID=1,Start="-2022-07-06 15:20:16.30",Stop="2022-07-06 16:33:11.1126355",expRes=400,empRes=True,Titulo="NotValidStartTime")
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts797934
+    def test_RetrieveRawData_StartandStopTime_NotvalidStopTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDStartStopTime(RevID=1,Start="2022-07-06 16:30:32.7003273",Stop="2022-07-06 16:15:32.7003273",expRes=400,empRes=True,Titulo="NotValidStopTime")
+        self.assertEqual(res, res,"Something went wrong")
+    
+    @pytest.mark.vsts797944
+    def test_RetrieveRawData_StartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDStartTime(RevID=1,Start="2022-07-06 16:30:32.7003273")
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataStartTime.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts797957
+    def test_RetrieveRawData_StartTime_InvalidStartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDStartTime(RevID=1,Start="-2022-07-06 16:30:32.7003273",Titulo="Notvalid",expRes=400,empRes=True)
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataStartTime.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts797956
+    def test_RetrieveRawData_StartTime_NonExistingConfigurationRunWithSelectedStartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RDStartTime(RevID=1,Start="2022-07-06 00:00:00.00",Titulo="Notvalid",expRes=204,empRes=True)
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataStartTime.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
 
     #Use Case 782953: Raw Data includes CDM values
 
+    @pytest.mark.vsts800049
+    def test_RetrieveRawData_CDMValues(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RawDataID(RevID=27,Titulo="CDMValues")
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RawDataIDCDMValues.json')
+        self.assertEqual(res, resExp,"Something went wrong")
 
     #Use Case 689753: 12. Retrieve Result Matrices for Configuration Run
 
@@ -605,29 +793,55 @@ class TestListElements(unittest.TestCase):
         self.assertEqual(len(NotificationInfo),len(resDB10),"Notification list size are different")
         logger.debug(NotificationInfo)
         logger.debug(resDB10)
-        """ for i in range(len(NotificationInfo)):
-            NotificationAPI=NotificationInfo[i]['Notification']
-            logger.debug(NotificationAPI)
-            Parametros = {"name":NotificationAPI}
-            resDB11 = dbConex.get_DataSet(table = 'Notification_Definition',dbParams=Parametros)
-            self.assertNotEqual([],resDB11,"Notification doesnt exist")
-            VariableNotificationAPI=NotificationInfo[i]['VariableName']
-            VariableNotificationDB=resDB11[0]['variable_name']
-            self.assertEqual(VariableNotificationAPI,VariableNotificationDB,"Notification Variable Name is wrong")
-            not_id=resDB11[0]['ID']
-            Parametros = {"name":NotificationAPI}
-            resDB11 = dbConex.get_DataSet(table = 'Notification_Definition',dbParams=Parametros)
+
+
+        Parametros = {"DataMasterID":CRID}
+            
+        resDB11 = dbConex.get_DataSet(table = 'ResultNotification',dbParams=Parametros)
+        i=0
+        logger.debug(resDB11)
+        for element in resDB11:
+            logger.debug(element)
+            definitionID=element['DefinitionID']
+            count=element['Count']
+            firstResultID=element['FirstResultID']
+            lastResultID=element['LastResultID']
+
             CountAPI=NotificationInfo[i]['Count']
-            CountDB=resDB11[0]['variable_name']
-            self.assertEqual(VariableNotificationAPI,VariableNotificationDB,"Notification Variable Name is wrong")
-            FlagID=resDB11[0]['flag_id']
-            Parametros = {"DataMasterID":CRID,"FlagID":FlagID}
-            resDB12 = dbConex.get_DataSet(table="ResultFlag",dbParams=Parametros)
-            date=str(resDB12[0]["CreatedDate"])[0:22]
-            flagAPIdate=str(flagInfo[i]['CreatedDate'][0:22]).replace("T"," ")
-            logger.debug(date)
-            logger.debug(flagAPIdate)
-            self.assertEqual(date,flagAPIdate,"Dates dont match") """
+            self.assertEqual(count,CountAPI,"Notification count  are different")
+            logger.debug(count)
+            logger.debug(CountAPI)
+            Parametros = {"ID":definitionID}
+            resDB12 = dbConex.get_DataSet(table = 'Notification_Definition',dbParams=Parametros)
+            
+            nameDB=resDB12[0]['name']
+            variableNameDB=resDB12[0]['variable_name']
+            nameApi=NotificationInfo[i]['Notification']
+            variableNameAPi=NotificationInfo[i]['VariableName']
+            self.assertEqual(nameDB,nameApi,"Notification name  are different")
+            self.assertEqual(variableNameDB,variableNameAPi,"Notification variable name  are different")
+            
+            #First result
+            Parametros = {"ResultID":firstResultID}
+            resDB13=dbConex.get_DataSet(table = 'ResultData',dbParams=Parametros)
+            fristSampleTimeDB=str(resDB13[0]['SampleTimeStamp'])[0:21]
+            fristSampleTimeAPI=str(NotificationInfo[i]['FirstSample']['SampleTime'])[0:21].replace("T"," ")
+            self.assertEqual(fristSampleTimeDB,fristSampleTimeAPI,"Notification first sample time  are different")
+            rawDataIDDB=resDB13[0]['RawDataID']
+            rawDataIDAPI=NotificationInfo[i]['FirstSample']['SampleID']
+            self.assertEqual(rawDataIDDB,rawDataIDAPI,"Notification first sample ID  are different")
+
+            #Last Sample
+            Parametros = {"ResultID":lastResultID}
+            resDB13=dbConex.get_DataSet(table = 'ResultData',dbParams=Parametros)
+            lastSampleTimeDB=str(resDB13[0]['SampleTimeStamp'])[0:21]
+            lasttSampleTimeAPI=str(NotificationInfo[i]['LastSample']['SampleTime'])[0:21].replace("T"," ")
+            self.assertEqual(lastSampleTimeDB,lasttSampleTimeAPI,"Notification last sample time  are different")
+            rawDataIDDB=resDB13[0]['RawDataID']
+            rawDataIDAPI=NotificationInfo[i]['LastSample']['SampleID']
+            self.assertEqual(rawDataIDDB,rawDataIDAPI,"Notification last sample ID  are different")
+
+            i+=1
 
     @pytest.mark.vsts800106
     def test_RetrievMetaInformationforConfigurationRuns_NonExistingConfigurationRun(self):
@@ -647,16 +861,434 @@ class TestListElements(unittest.TestCase):
 
     #Use Case 783305: Retrieve configuration runs by metadata tag
 
+    @pytest.mark.vsts793677
+    def test_RetrieveConfigurationRunsbyMetadataTag_MandatoryPhaseTag(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        #Get API response and information from DataBase
+        dbConex = dbConnection()
+        TName='Product'
+        TValue='Fases2'
+        resAPI = endpoints.get_RetConfRunbyMetaTag(Titulo='MandatoryPhaseTag',TagName=TName,TagValue=TValue)
+        #Check structure of the response
+        logger.debug(resAPI[5].keys())
+        Structure=['ConfigurationInfo', 'TagsInfo']
+        StrucAPI=list(resAPI[5].keys())
+        self.assertEqual(Structure,StrucAPI,'The information structure is diferent')
+        #Check structure of the Tags information
+        logger.debug(resAPI[5]['TagsInfo'].keys())
+        Structure=['MetadataTags', 'PhaseTags']
+        StrucAPI=list(resAPI[5]['TagsInfo'].keys())
+        self.assertEqual(Structure,StrucAPI,'The Tags information structure is diferent')
+        #Check if the same number of runs are in the DB and in the RestAPI
+        Parametros={'Type':1,'Label':TName}
+        resDB = dbConex.get_DataSet(table = 'Tag', dbParams=Parametros)
+        logger.debug(resDB)
+        TagID=resDB[0]['ID']
+        Parametros={'TagID':TagID,'Value':TValue,'IsLatest':1}
+        resDB = dbConex.get_DataSet(table = 'DataMasterTag', dbParams=Parametros)
+        logger.debug(resDB)
+        TagModID=[]
+        for element in resDB:
+            TagModID.append(element['DataMasterTagModification'])
+        logger.debug(TagModID)
+        Expe=[]
+        for element in TagModID:
+            Parametros={'ID':element}
+            resDB=dbConex.get_DataSet(table = 'DataMasterTagModification',dbParams= Parametros)
+            Expe.append(resDB[0]['DataMasterID'])
+        logger.debug(Expe)
+        self.assertEqual(len(Expe),len(resAPI),"They dont have the sam enumber of Configuration Runs")
+        #Create a Dictionary to assosiate Label Tag with TagID
+        Tags={}
+        Parametros={'Type':1}
+        resDB = dbConex.get_DataSet(table = 'Tag', dbParams=Parametros)
+        for element in resDB:
+            Tags[element["ID"]]=element["Label"] 
 
-
-
+        #Verify Information of every ConfigurationRun in the RestAPI
+        for element in resAPI:
+            #Check ConfigurationInfo
+            Parametros={'ID':element['ConfigurationInfo']['RunID']}
+            resDB=dbConex.get_DataSet(table = 'DataMaster',dbParams= Parametros)
+            logger.debug(element['ConfigurationInfo']['RevisionID'])
+            logger.debug(resDB[0]['rev_id'])
+            revID=resDB[0]['rev_id']
+            self.assertEqual(element['ConfigurationInfo']['RevisionID'],revID,'Revision ID is not the same')
+            logger.debug(str(resDB[0]['StartTime'])[:22])
+            logger.debug(((element['ConfigurationInfo']['StartTime']).replace('T',' '))[:22])
+            self.assertEqual(str(resDB[0]['StartTime'])[:22],((element['ConfigurationInfo']['StartTime']).replace('T',' '))[:22],'StartTime is diferent in this experiment')
+            logger.debug(str(resDB[0]['EndTime'])[:22])
+            logger.debug(((element['ConfigurationInfo']['StopTime']).replace('T',' '))[:22])
+            self.assertEqual(str(resDB[0]['EndTime'])[:22],((element['ConfigurationInfo']['StopTime']).replace('T',' '))[:22],'StopTime is diferent in this experiment')
+            Parametros={'RevisionID':revID}
+            resDB=dbConex.get_DataSet(table = 'ConfigurationRevision',dbParams= Parametros)
+            logger.debug(resDB[0]['ConfigurationID'])
+            confID=resDB[0]['ConfigurationID']
+            logger.debug(element['ConfigurationInfo']['ConfigurationID'])
+            self.assertEqual(element['ConfigurationInfo']['ConfigurationID'],confID,'Configuration ID is not the same')
+            Parametros={'config_id':confID}
+            resDB=dbConex.get_DataSet(table = 'Configurations',dbParams= Parametros)
+            logger.debug(resDB[0]['name'])
+            logger.debug(element['ConfigurationInfo']['Name'])
+            self.assertEqual(element['ConfigurationInfo']['Name'],resDB[0]['name'],'Configuration Name is not the same')
+            #Check all the DataMasterModificationID that the experiment has
+            Parametros={'DataMasterID':element['ConfigurationInfo']['RunID']}
+            resDBnew=dbConex.get_DataSet(table = 'DataMasterTagModification',dbParams= Parametros)
+            for ModID in resDBnew:
+                Parametros2={'DataMasterTagModification':ModID['ID'],'IsLatest':1}
+                resDBothernew=dbConex.get_DataSet(table = 'DataMasterTag',dbParams= Parametros2)
+                
+                for stuff in resDBothernew:
+                    if stuff['PhaseId'] == None:
+                        logger.debug(stuff['Value'])
+                        logger.debug(element['TagsInfo']['MetadataTags'][Tags[stuff['TagID']]])
+                        ValueTagDB=stuff['Value']
+                        ValueTagAPI=element['TagsInfo']['MetadataTags'][Tags[stuff['TagID']]]
+                        if ValueTagAPI=='':
+                            ValueTagAPI=None
+                        self.assertEqual(ValueTagDB,ValueTagAPI,'This Tag has a different value')
+                    else:
+                        logger.debug(stuff['Value'])
+                        ValueDB=stuff['Value']
+                        logger.debug(element['TagsInfo']['PhaseTags'][stuff['PhaseId']-1]['PhaseTags'][Tags[stuff['TagID']]])
+                        ValueAPI=element['TagsInfo']['PhaseTags'][stuff['PhaseId']-1]['PhaseTags'][Tags[stuff['TagID']]]
+                        if ValueAPI=='':
+                            ValueAPI=None
+                        self.assertEqual(ValueDB,ValueAPI,'This Tag has not the same value')
     
+    @pytest.mark.vsts793499
+    def test_RetrieveConfigurationRunsbyMetadataTag_EmptyTag(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        #Get API response and information from DataBase
+        dbConex = dbConnection()
+        TName='Tag3'
+        TValue='someVale'
+        resAPI = endpoints.get_RetConfRunbyMetaTag(Titulo='EmptyTag',TagName=TName,TagValue=TValue, expRes=204, empRes=True)
+        logger.debug(resAPI)
 
+    @pytest.mark.vsts793496
+    def test_RetrieveConfigurationRunsbyMetadataTag_MandatoryTag(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        #Get API response and information from DataBase
+        dbConex = dbConnection()
+        TName='Experiment ID'
+        TValue='OtroExp1'
+        resAPI = endpoints.get_RetConfRunbyMetaTag(Titulo='MandatoryTag',TagName=TName,TagValue=TValue)
+        #Check structure of the response
+        logger.debug(resAPI[1].keys())
+        Structure=['ConfigurationInfo', 'TagsInfo']
+        StrucAPI=list(resAPI[1].keys())
+        self.assertEqual(Structure,StrucAPI,'The information structure is diferent')
+        #Check structure of the Tags information
+        logger.debug(resAPI[1]['TagsInfo'].keys())
+        Structure=['MetadataTags', 'PhaseTags']
+        StrucAPI=list(resAPI[1]['TagsInfo'].keys())
+        self.assertEqual(Structure,StrucAPI,'The Tags information structure is diferent')
+        #Check if the same number of runs are in the DB and in the RestAPI
+        Parametros={'Type':1,'Label':TName}
+        resDB = dbConex.get_DataSet(table = 'Tag', dbParams=Parametros)
+        logger.debug(resDB)
+        TagID=resDB[0]['ID']
+        Parametros={'TagID':TagID,'Value':TValue,'IsLatest':1}
+        resDB = dbConex.get_DataSet(table = 'DataMasterTag', dbParams=Parametros)
+        logger.debug(resDB)
+        TagModID=[]
+        for element in resDB:
+            TagModID.append(element['DataMasterTagModification'])
+        logger.debug(TagModID)
+        Expe=[]
+        for element in TagModID:
+            Parametros={'ID':element}
+            resDB=dbConex.get_DataSet(table = 'DataMasterTagModification',dbParams= Parametros)
+            Expe.append(resDB[0]['DataMasterID'])
+        logger.debug(Expe)
+        self.assertEqual(len(Expe),len(resAPI),"They dont have the sam enumber of Configuration Runs")
+        #Create a Dictionary to assosiate Label Tag with TagID
+        Tags={}
+        Parametros={'Type':1}
+        resDB = dbConex.get_DataSet(table = 'Tag', dbParams=Parametros)
+        for element in resDB:
+            Tags[element["ID"]]=element["Label"] 
+
+        #Verify Information of every ConfigurationRun in the RestAPI
+        for element in resAPI:
+            #Check ConfigurationInfo
+            Parametros={'ID':element['ConfigurationInfo']['RunID']}
+            resDB=dbConex.get_DataSet(table = 'DataMaster',dbParams= Parametros)
+            logger.debug(element['ConfigurationInfo']['RevisionID'])
+            logger.debug(resDB[0]['rev_id'])
+            revID=resDB[0]['rev_id']
+            self.assertEqual(element['ConfigurationInfo']['RevisionID'],revID,'Revision ID is not the same')
+            logger.debug(str(resDB[0]['StartTime'])[:22])
+            logger.debug(((element['ConfigurationInfo']['StartTime']).replace('T',' '))[:22])
+            self.assertEqual(str(resDB[0]['StartTime'])[:22],((element['ConfigurationInfo']['StartTime']).replace('T',' '))[:22],'StartTime is diferent in this experiment')
+            logger.debug(str(resDB[0]['EndTime'])[:22])
+            logger.debug(((element['ConfigurationInfo']['StopTime']).replace('T',' '))[:22])
+            self.assertEqual(str(resDB[0]['EndTime'])[:22],((element['ConfigurationInfo']['StopTime']).replace('T',' '))[:22],'StopTime is diferent in this experiment')
+            Parametros={'RevisionID':revID}
+            resDB=dbConex.get_DataSet(table = 'ConfigurationRevision',dbParams= Parametros)
+            logger.debug(resDB[0]['ConfigurationID'])
+            confID=resDB[0]['ConfigurationID']
+            logger.debug(element['ConfigurationInfo']['ConfigurationID'])
+            self.assertEqual(element['ConfigurationInfo']['ConfigurationID'],confID,'Configuration ID is not the same')
+            Parametros={'config_id':confID}
+            resDB=dbConex.get_DataSet(table = 'Configurations',dbParams= Parametros)
+            logger.debug(resDB[0]['name'])
+            logger.debug(element['ConfigurationInfo']['Name'])
+            self.assertEqual(element['ConfigurationInfo']['Name'],resDB[0]['name'],'Configuration Name is not the same')
+            #Check all the DataMasterModificationID that the experiment has
+            Parametros={'DataMasterID':element['ConfigurationInfo']['RunID']}
+            resDBnew=dbConex.get_DataSet(table = 'DataMasterTagModification',dbParams= Parametros)
+            for ModID in resDBnew:
+                Parametros2={'DataMasterTagModification':ModID['ID'],'IsLatest':1}
+                resDBothernew=dbConex.get_DataSet(table = 'DataMasterTag',dbParams= Parametros2)
+                
+                for stuff in resDBothernew:
+                    if stuff['PhaseId'] == None:
+                        logger.debug(stuff['Value'])
+                        logger.debug(element['TagsInfo']['MetadataTags'][Tags[stuff['TagID']]])
+                        ValueTagDB=stuff['Value']
+                        ValueTagAPI=element['TagsInfo']['MetadataTags'][Tags[stuff['TagID']]]
+                        if ValueTagAPI=='':
+                            ValueTagAPI=None
+                        self.assertEqual(ValueTagDB,ValueTagAPI,'This Tag has a different value')
+                    else:
+                        logger.debug(stuff['Value'])
+                        ValueDB=stuff['Value']
+                        logger.debug(element['TagsInfo']['PhaseTags'][stuff['PhaseId']-1]['PhaseTags'][Tags[stuff['TagID']]])
+                        ValueAPI=element['TagsInfo']['PhaseTags'][stuff['PhaseId']-1]['PhaseTags'][Tags[stuff['TagID']]]
+                        if ValueAPI=='':
+                            ValueAPI=None
+                        self.assertEqual(ValueDB,ValueAPI,'This Tag has not the same value')
+    
+    @pytest.mark.vsts793498
+    def test_RetrieveConfigurationRunsbyMetadataTag_NonexistingTag(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        #Get API response and information from DataBase
+        dbConex = dbConnection()
+        TName='NonExistingTag'
+        TValue='Testing'
+        resAPI = endpoints.get_RetConfRunbyMetaTag(Titulo='NonexistingTag',TagName=TName,TagValue=TValue, expRes=400, empRes=True)
+        logger.debug(resAPI)
+
+    @pytest.mark.vsts793497
+    def test_RetrieveConfigurationRunsbyMetadataTag_PhaseTag(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        #Get API response and information from DataBase
+        dbConex = dbConnection()
+        TName='Tag2'
+        TValue='PhaseTest2'
+        resAPI = endpoints.get_RetConfRunbyMetaTag(Titulo='PhaseTag',TagName=TName,TagValue=TValue)
+        #Check structure of the response
+        logger.debug(resAPI[1].keys())
+        Structure=['ConfigurationInfo', 'TagsInfo']
+        StrucAPI=list(resAPI[1].keys())
+        self.assertEqual(Structure,StrucAPI,'The information structure is diferent')
+        #Check structure of the Tags information
+        logger.debug(resAPI[1]['TagsInfo'].keys())
+        Structure=['MetadataTags', 'PhaseTags']
+        StrucAPI=list(resAPI[1]['TagsInfo'].keys())
+        self.assertEqual(Structure,StrucAPI,'The Tags information structure is diferent')
+        #Check if the same number of runs are in the DB and in the RestAPI
+        Parametros={'Type':1,'Label':TName}
+        resDB = dbConex.get_DataSet(table = 'Tag', dbParams=Parametros)
+        logger.debug(resDB)
+        TagID=resDB[0]['ID']
+        Parametros={'TagID':TagID,'Value':TValue,'IsLatest':1}
+        resDB = dbConex.get_DataSet(table = 'DataMasterTag', dbParams=Parametros)
+        logger.debug(resDB)
+        TagModID=[]
+        for element in resDB:
+            TagModID.append(element['DataMasterTagModification'])
+        logger.debug(TagModID)
+        Expe=[]
+        for element in TagModID:
+            Parametros={'ID':element}
+            resDB=dbConex.get_DataSet(table = 'DataMasterTagModification',dbParams= Parametros)
+            Expe.append(resDB[0]['DataMasterID'])
+        logger.debug(Expe)
+        self.assertEqual(len(Expe),len(resAPI),"They dont have the sam enumber of Configuration Runs")
+        #Create a Dictionary to assosiate Label Tag with TagID
+        Tags={}
+        Parametros={'Type':1}
+        resDB = dbConex.get_DataSet(table = 'Tag', dbParams=Parametros)
+        for element in resDB:
+            Tags[element["ID"]]=element["Label"] 
+
+        #Verify Information of every ConfigurationRun in the RestAPI
+        for element in resAPI:
+            #Check ConfigurationInfo
+            Parametros={'ID':element['ConfigurationInfo']['RunID']}
+            resDB=dbConex.get_DataSet(table = 'DataMaster',dbParams= Parametros)
+            logger.debug(element['ConfigurationInfo']['RevisionID'])
+            logger.debug(resDB[0]['rev_id'])
+            revID=resDB[0]['rev_id']
+            self.assertEqual(element['ConfigurationInfo']['RevisionID'],revID,'Revision ID is not the same')
+            logger.debug(str(resDB[0]['StartTime'])[:22])
+            logger.debug(((element['ConfigurationInfo']['StartTime']).replace('T',' '))[:22])
+            self.assertEqual(str(resDB[0]['StartTime'])[:22],((element['ConfigurationInfo']['StartTime']).replace('T',' '))[:22],'StartTime is diferent in this experiment')
+            logger.debug(str(resDB[0]['EndTime'])[:22])
+            logger.debug(((element['ConfigurationInfo']['StopTime']).replace('T',' '))[:22])
+            self.assertEqual(str(resDB[0]['EndTime'])[:22],((element['ConfigurationInfo']['StopTime']).replace('T',' '))[:22],'StopTime is diferent in this experiment')
+            Parametros={'RevisionID':revID}
+            resDB=dbConex.get_DataSet(table = 'ConfigurationRevision',dbParams= Parametros)
+            logger.debug(resDB[0]['ConfigurationID'])
+            confID=resDB[0]['ConfigurationID']
+            logger.debug(element['ConfigurationInfo']['ConfigurationID'])
+            self.assertEqual(element['ConfigurationInfo']['ConfigurationID'],confID,'Configuration ID is not the same')
+            Parametros={'config_id':confID}
+            resDB=dbConex.get_DataSet(table = 'Configurations',dbParams= Parametros)
+            logger.debug(resDB[0]['name'])
+            logger.debug(element['ConfigurationInfo']['Name'])
+            self.assertEqual(element['ConfigurationInfo']['Name'],resDB[0]['name'],'Configuration Name is not the same')
+            #Check all the DataMasterModificationID that the experiment has
+            Parametros={'DataMasterID':element['ConfigurationInfo']['RunID']}
+            resDBnew=dbConex.get_DataSet(table = 'DataMasterTagModification',dbParams= Parametros)
+            for ModID in resDBnew:
+                Parametros2={'DataMasterTagModification':ModID['ID'],'IsLatest':1}
+                resDBothernew=dbConex.get_DataSet(table = 'DataMasterTag',dbParams= Parametros2)
+                
+                for stuff in resDBothernew:
+                    if stuff['PhaseId'] == None:
+                        logger.debug(stuff['Value'])
+                        logger.debug(element['TagsInfo']['MetadataTags'][Tags[stuff['TagID']]])
+                        ValueTagDB=stuff['Value']
+                        ValueTagAPI=element['TagsInfo']['MetadataTags'][Tags[stuff['TagID']]]
+                        if ValueTagAPI=='':
+                            ValueTagAPI=None
+                        self.assertEqual(ValueTagDB,ValueTagAPI,'This Tag has a different value')
+                    else:
+                        logger.debug(stuff['Value'])
+                        ValueDB=stuff['Value']
+                        logger.debug(element['TagsInfo']['PhaseTags'][stuff['PhaseId']-1]['PhaseTags'][Tags[stuff['TagID']]])
+                        ValueAPI=element['TagsInfo']['PhaseTags'][stuff['PhaseId']-1]['PhaseTags'][Tags[stuff['TagID']]]
+                        if ValueAPI=='':
+                            ValueAPI=None
+                        self.assertEqual(ValueDB,ValueAPI,'This Tag has not the same value')
+
+    @pytest.mark.vsts793495
+    def test_RetrieveConfigurationRunsbyMetadataTag_Tag(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        #Get API response and information from DataBase
+        dbConex = dbConnection()
+        TName='Project Name'
+        TValue='Prueba1'
+        resAPI = endpoints.get_RetConfRunbyMetaTag(Titulo='Tag',TagName=TName,TagValue=TValue)
+        #Check structure of the response
+        logger.debug(resAPI[1].keys())
+        Structure=['ConfigurationInfo', 'TagsInfo']
+        StrucAPI=list(resAPI[1].keys())
+        self.assertEqual(Structure,StrucAPI,'The information structure is diferent')
+        #Check structure of the Tags information
+        logger.debug(resAPI[1]['TagsInfo'].keys())
+        Structure=['MetadataTags', 'PhaseTags']
+        StrucAPI=list(resAPI[1]['TagsInfo'].keys())
+        self.assertEqual(Structure,StrucAPI,'The Tags information structure is diferent')
+        #Check if the same number of runs are in the DB and in the RestAPI
+        Parametros={'Type':1,'Label':TName}
+        resDB = dbConex.get_DataSet(table = 'Tag', dbParams=Parametros)
+        logger.debug(resDB)
+        TagID=resDB[0]['ID']
+        Parametros={'TagID':TagID,'Value':TValue,'IsLatest':1}
+        resDB = dbConex.get_DataSet(table = 'DataMasterTag', dbParams=Parametros)
+        logger.debug(resDB)
+        TagModID=[]
+        for element in resDB:
+            TagModID.append(element['DataMasterTagModification'])
+        logger.debug(TagModID)
+        Expe=[]
+        for element in TagModID:
+            Parametros={'ID':element}
+            resDB=dbConex.get_DataSet(table = 'DataMasterTagModification',dbParams= Parametros)
+            Expe.append(resDB[0]['DataMasterID'])
+        logger.debug(Expe)
+        self.assertEqual(len(Expe),len(resAPI),"They dont have the sam enumber of Configuration Runs")
+        #Create a Dictionary to assosiate Label Tag with TagID
+        Tags={}
+        Parametros={'Type':1}
+        resDB = dbConex.get_DataSet(table = 'Tag', dbParams=Parametros)
+        for element in resDB:
+            Tags[element["ID"]]=element["Label"] 
+
+        #Verify Information of every ConfigurationRun in the RestAPI
+        for element in resAPI:
+            #Check ConfigurationInfo
+            Parametros={'ID':element['ConfigurationInfo']['RunID']}
+            resDB=dbConex.get_DataSet(table = 'DataMaster',dbParams= Parametros)
+            logger.debug(element['ConfigurationInfo']['RevisionID'])
+            logger.debug(resDB[0]['rev_id'])
+            revID=resDB[0]['rev_id']
+            self.assertEqual(element['ConfigurationInfo']['RevisionID'],revID,'Revision ID is not the same')
+            logger.debug(str(resDB[0]['StartTime'])[:22])
+            logger.debug(((element['ConfigurationInfo']['StartTime']).replace('T',' '))[:22])
+            self.assertEqual(str(resDB[0]['StartTime'])[:22],((element['ConfigurationInfo']['StartTime']).replace('T',' '))[:22],'StartTime is diferent in this experiment')
+            logger.debug(str(resDB[0]['EndTime'])[:22])
+            logger.debug(((element['ConfigurationInfo']['StopTime']).replace('T',' '))[:22])
+            self.assertEqual(str(resDB[0]['EndTime'])[:22],((element['ConfigurationInfo']['StopTime']).replace('T',' '))[:22],'StopTime is diferent in this experiment')
+            Parametros={'RevisionID':revID}
+            resDB=dbConex.get_DataSet(table = 'ConfigurationRevision',dbParams= Parametros)
+            logger.debug(resDB[0]['ConfigurationID'])
+            confID=resDB[0]['ConfigurationID']
+            logger.debug(element['ConfigurationInfo']['ConfigurationID'])
+            self.assertEqual(element['ConfigurationInfo']['ConfigurationID'],confID,'Configuration ID is not the same')
+            Parametros={'config_id':confID}
+            resDB=dbConex.get_DataSet(table = 'Configurations',dbParams= Parametros)
+            logger.debug(resDB[0]['name'])
+            logger.debug(element['ConfigurationInfo']['Name'])
+            self.assertEqual(element['ConfigurationInfo']['Name'],resDB[0]['name'],'Configuration Name is not the same')
+            #Check all the DataMasterModificationID that the experiment has
+            Parametros={'DataMasterID':element['ConfigurationInfo']['RunID']}
+            resDBnew=dbConex.get_DataSet(table = 'DataMasterTagModification',dbParams= Parametros)
+            for ModID in resDBnew:
+                Parametros2={'DataMasterTagModification':ModID['ID'],'IsLatest':1}
+                resDBothernew=dbConex.get_DataSet(table = 'DataMasterTag',dbParams= Parametros2)
+                
+                for stuff in resDBothernew:
+                    if stuff['PhaseId'] == None:
+                        logger.debug(stuff['Value'])
+                        logger.debug(element['TagsInfo']['MetadataTags'][Tags[stuff['TagID']]])
+                        ValueTagDB=stuff['Value']
+                        ValueTagAPI=element['TagsInfo']['MetadataTags'][Tags[stuff['TagID']]]
+                        if ValueTagAPI=='':
+                            ValueTagAPI=None
+                        self.assertEqual(ValueTagDB,ValueTagAPI,'This Tag has a different value')
+                    else:
+                        logger.debug(stuff['Value'])
+                        ValueDB=stuff['Value']
+                        logger.debug(element['TagsInfo']['PhaseTags'][stuff['PhaseId']-1]['PhaseTags'][Tags[stuff['TagID']]])
+                        ValueAPI=element['TagsInfo']['PhaseTags'][stuff['PhaseId']-1]['PhaseTags'][Tags[stuff['TagID']]]
+                        if ValueAPI=='':
+                            ValueAPI=None
+                        self.assertEqual(ValueDB,ValueAPI,'This Tag has not the same value')
+
+    @pytest.mark.vsts793676
+    def test_RetrieveConfigurationRunsbyMetadataTag_WrongValue(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        #Get API response and information from DataBase
+        dbConex = dbConnection()
+        TName='Project Name'
+        TValue='WrongValue'
+        resAPI = endpoints.get_RetConfRunbyMetaTag(Titulo='WrongValue',TagName=TName,TagValue=TValue,expRes=400,empRes=True)
+        
 
     #Use Case 793628: Retrieve tag information
         
     @pytest.mark.vsts793895
-    def test_RetrieveListOfTags(self):
+    def test_RetrieveTagInformation_ListOfTags(self):
         
         logger.debug(self.id())
 
@@ -677,11 +1309,45 @@ class TestListElements(unittest.TestCase):
             logger.debug(i["Label"])
             self.assertIn(i["Label"],resAPI,"Tag "+i["Label"]+" was not found")
               
-    @pytest.mark.vstsk793915
+    @pytest.mark.vsts793915
     def test_RetrieveTagInformation_EmptyTag(self):
         
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_ConfigTags(RevID=0, expRes=400, empRes=True)
+        res = endpoints.get_ConfigTags(Titulo='EmptyTag',LabelName='EmpTag', expRes=204, empRes=True)
         self.assertEqual(res, res,"Something went wrong")  
 
+    @pytest.mark.vsts793880
+    def test_RetrieveTagInformation_ListofValuesforaTag(self):
+        
+        #Get information from DataBase and RestAPI
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        Tag='Tag2'
+        resAPI = endpoints.get_ConfigTags(Titulo='ListOfValues',LabelName=Tag)
+        dbConex = dbConnection()
+        varTagType = {"Type":1,"Label":Tag}
+        resDB = dbConex.get_DataSet(table = 'Tag',dbParams = varTagType)
+        logger.debug(resDB)
+        TagID=resDB[0]['ID']
+        logger.debug(TagID)
+        Parametros = {"TagID":TagID}
+        resDB = dbConex.get_DataSet(table = 'DataMasterTag',dbParams = Parametros)
+        #logger.debug(resDB)
+        #Check both have the same number of Data Sources
+        TagValues=[]
+        for element in resDB:
+            TagValues.append(element['Value'])
+        logger.debug('Estos values salieron')
+        logger.debug(TagValues)
+        for element in resAPI:
+            logger.debug(element)
+            self.assertIn(element,TagValues)
+        
+    @pytest.mark.vsts793904
+    def test_RetrieveTagInformation_NonExistentTag(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_ConfigTags(Titulo='NonExistingTag',LabelName='NonexistentTag', expRes=400, empRes=True)
+        self.assertEqual(res, res,"Something went wrong")  

@@ -52,7 +52,7 @@ class Endpoints(object):
         return api_res
 
     def get_ConfRunList(self):
-        api_res = self.requestUtility.get("/Configuration/GetConfigurationRunMetadataByRunID?runID=31")
+        api_res = self.requestUtility.get("/Configuration/RunsList?ConfigurationId=1")
         with open('ConfRunsList.json', 'w') as f:
             json.dump(api_res, f, indent=2)
             logger.debug('File Created')
@@ -87,22 +87,52 @@ class Endpoints(object):
         logger.debug(api_res)
         return api_res
 
-        #&Offset=4&Rows=2
+    def get_RawDataID(self, RevID=1,Titulo='',expRes=200,empRes=False):
+        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID),expected_status_code=expRes,resEmpty=empRes)
+        with open('RawDataID'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
 
-    def get_RawDataID(self, RevID=1):
-        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID))
-        with open('RawDataID.json', 'w') as f:
+    def get_RawDataLastNRows(self, RevID=1,Rows='1',Titulo='',expRes=200,empRes=False):
+        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID)+'&LastN='+str(Rows),expected_status_code=expRes,resEmpty=empRes)
+        with open('RawDataIDLastNRows'+Titulo+'.json', 'w') as f:
             json.dump(api_res, f, indent=2)
             logger.debug('File Created')
         logger.debug(api_res)
         return api_res
     
-    def get_RDIDOffset(self, RevID=1,Off=1,Rows=1):
-        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID)+"&Offset="+str(Off)+"&Rows="+str(Rows))
-        with open('RawDataIDOffset.json', 'w') as f:
+    def get_RDIDOffset(self,Titulo='', RevID=1,Off=1,Rows=1,expRes=200,empRes=False):
+        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID)+"&Offset="+str(Off)+"&Rows="+str(Rows),expected_status_code=expRes,resEmpty=empRes)
+        with open('RawDataIDOffsetandRows'+Titulo+'.json', 'w') as f:
             json.dump(api_res, f, indent=2)
             logger.debug('File Created')
         #logger.debug(api_res)
+        return api_res
+    
+    def get_RDRecent(self,Titulo='', RevID=1,Time=5,expRes=200,empRes=False):
+        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID)+"&Recent="+str(Time),expected_status_code=expRes,resEmpty=empRes)
+        with open('RawDataRecentTime'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
+
+    def get_RDStartStopTime(self,Titulo='', RevID=1,Start="",Stop="",expRes=200,empRes=False):
+        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID)+"&TimeStart="+str(Start)+"&TimeEnd=",expected_status_code=expRes,resEmpty=empRes)
+        with open('RawDataStartStopTime'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
+
+    def get_RDStartTime(self,Titulo='', RevID=1,Start="", expRes=200,empRes=False):
+        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID)+"&TimeStart="+str(Start),expected_status_code=expRes,resEmpty=empRes)
+        with open('RawDataStartTime'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
         return api_res
 
     
@@ -138,17 +168,21 @@ class Endpoints(object):
         logger.debug(api_res)
         return api_res
 
-    
-
-
     def get_ConfigTags(self, Titulo='Tags',LabelName='',expRes=200,empRes=False):
         api_res = self.requestUtility.get("/configuration/GetTagInformation?label="+LabelName,expected_status_code=expRes,resEmpty=empRes)
-        with open('ConfigTagsRetrieve.json', 'w') as f:
+        with open('ConfigTagsRetrieve'+Titulo+'.json', 'w') as f:
             json.dump(api_res, f, indent=2)
             logger.debug('File Created')
         logger.debug(api_res)
         return api_res
 
+    def get_RetConfRunbyMetaTag(self, Titulo='Tags',TagName='',TagValue='',expRes=200,empRes=False):
+        api_res = self.requestUtility.get("/Configuration/GetConfigurationRunsByTags?TagKey="+TagName+"&TagValue="+TagValue,expected_status_code=expRes,resEmpty=empRes)
+        with open('ConfigRunbyMetaData'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
 
     def get_RRMNFull(self):
         api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=3?MatrixName=Scores")

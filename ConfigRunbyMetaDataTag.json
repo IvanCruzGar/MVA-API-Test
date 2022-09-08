@@ -1,0 +1,224 @@
+[
+  {
+    "ConfigurationInfo": {
+      "RunID": 23,
+      "ConfigurationID": 1,
+      "Name": "ASCII_PCA",
+      "RevisionID": 1,
+      "StartTime": "2022-07-27T13:37:44.9706513Z",
+      "StopTime": "2022-07-27T13:37:45.3320831Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Experiment ID": "ExpFas1",
+        "Project Name": "Prueba1",
+        "Tag1": ""
+      },
+      "PhaseTags": [
+        {
+          "PhaseName": "Fase1",
+          "StartDate": "0001-01-01T00:00:00",
+          "PhaseTags": {
+            "Product": "Fases1",
+            "Tag2": "Test",
+            "Tag3": ""
+          }
+        },
+        {
+          "PhaseName": "Fase2",
+          "StartDate": "0001-01-01T00:00:00",
+          "PhaseTags": {
+            "Product": "Fases2",
+            "Tag2": "Testing",
+            "Tag3": ""
+          }
+        }
+      ]
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 24,
+      "ConfigurationID": 12,
+      "Name": "ConfigFases",
+      "RevisionID": 12,
+      "StartTime": "2022-07-27T13:54:26.3550271Z",
+      "StopTime": "2022-07-27T13:56:04.6734907Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Experiment ID": "ExpFas1",
+        "Project Name": "Prueba1",
+        "Tag1": ""
+      },
+      "PhaseTags": [
+        {
+          "PhaseName": "Fase1",
+          "StartDate": "2022-07-27T13:54:55.4652385Z",
+          "PhaseTags": {
+            "Product": "Fases1",
+            "Tag2": "Test",
+            "Tag3": ""
+          }
+        },
+        {
+          "PhaseName": "Fase2",
+          "StartDate": "2022-07-27T13:54:57.2710354Z",
+          "PhaseTags": {
+            "Product": "Fases2",
+            "Tag2": "Testing",
+            "Tag3": ""
+          }
+        }
+      ]
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 25,
+      "ConfigurationID": 12,
+      "Name": "ConfigFases",
+      "RevisionID": 12,
+      "StartTime": "2022-07-27T13:57:32.657958Z",
+      "StopTime": "2022-07-27T13:58:09.8907703Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Experiment ID": "OtroExp1",
+        "Project Name": "Prueba1",
+        "Tag1": ""
+      },
+      "PhaseTags": [
+        {
+          "PhaseName": "Fase1",
+          "StartDate": "2022-07-27T13:57:45.4537708Z",
+          "PhaseTags": {
+            "Product": "Fases1",
+            "Tag2": "PhaseTest1",
+            "Tag3": ""
+          }
+        },
+        {
+          "PhaseName": "Fase2",
+          "StartDate": "2022-07-27T13:57:47.2957735Z",
+          "PhaseTags": {
+            "Product": "Fases2",
+            "Tag2": "PhaseTest2",
+            "Tag3": ""
+          }
+        }
+      ]
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 28,
+      "ConfigurationID": 12,
+      "Name": "ConfigFases",
+      "RevisionID": 15,
+      "StartTime": "2022-08-22T20:54:30.7462532Z",
+      "StopTime": "2022-08-22T20:56:01.7380817Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Experiment ID": "OtroExp1",
+        "Project Name": "Prueba1",
+        "Tag1": ""
+      },
+      "PhaseTags": [
+        {
+          "PhaseName": "Fase1",
+          "StartDate": "0001-01-01T00:00:00",
+          "PhaseTags": {
+            "Product": "Fases1",
+            "Tag2": "PhaseTest1",
+            "Tag3": ""
+          }
+        },
+        {
+          "PhaseName": "Fase2",
+          "StartDate": "0001-01-01T00:00:00",
+          "PhaseTags": {
+            "Product": "Fases2",
+            "Tag2": "PhaseTest2",
+            "Tag3": ""
+          }
+        }
+      ]
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 30,
+      "ConfigurationID": 12,
+      "Name": "ConfigFases",
+      "RevisionID": 16,
+      "StartTime": "2022-08-22T21:04:19.0643409Z",
+      "StopTime": "2022-08-22T21:07:18.0523034Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Experiment ID": "OtroExp1",
+        "Project Name": "Prueba1",
+        "Tag1": ""
+      },
+      "PhaseTags": [
+        {
+          "PhaseName": "Fase1",
+          "StartDate": "2022-08-22T21:04:27.6579942Z",
+          "PhaseTags": {
+            "Product": "Fases1",
+            "Tag2": "PhaseTest1",
+            "Tag3": ""
+          }
+        },
+        {
+          "PhaseName": "Fase2",
+          "StartDate": "2022-08-22T21:06:50.258271Z",
+          "PhaseTags": {
+            "Product": "Fases2",
+            "Tag2": "PhaseTest2",
+            "Tag3": ""
+          }
+        }
+      ]
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 31,
+      "ConfigurationID": 12,
+      "Name": "ConfigFases",
+      "RevisionID": 16,
+      "StartTime": "2022-08-22T21:14:09.8540549Z",
+      "StopTime": "2022-08-22T21:16:24.2616408Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Experiment ID": "OtroExp1",
+        "Project Name": "Prueba1",
+        "Tag1": ""
+      },
+      "PhaseTags": [
+        {
+          "PhaseName": "Fase1",
+          "StartDate": "2022-08-22T21:14:36.7497001Z",
+          "PhaseTags": {
+            "Product": "Fases1",
+            "Tag2": "PhaseTest1",
+            "Tag3": ""
+          }
+        },
+        {
+          "PhaseName": "Fase2",
+          "StartDate": "2022-08-22T21:14:54.396896Z",
+          "PhaseTags": {
+            "Product": "Fases2",
+            "Tag2": "PhaseTest2",
+            "Tag3": ""
+          }
+        }
+      ]
+    }
+  }
+]

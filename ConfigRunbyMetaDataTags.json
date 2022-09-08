@@ -1,0 +1,545 @@
+[
+  {
+    "ConfigurationInfo": {
+      "RunID": 1,
+      "ConfigurationID": 6,
+      "Name": "SVMR",
+      "RevisionID": 6,
+      "StartTime": "2022-07-06T16:30:32.7003273Z",
+      "StopTime": "2022-07-06T16:33:11.1126355Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 2,
+      "ConfigurationID": 2,
+      "Name": "SIMCA_PCA",
+      "RevisionID": 2,
+      "StartTime": "2022-07-06T16:30:37.2263745Z",
+      "StopTime": "2022-07-06T16:33:10.3672282Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 3,
+      "ConfigurationID": 10,
+      "Name": "PCR_Qresid",
+      "RevisionID": 10,
+      "StartTime": "2022-07-06T16:30:42.4855645Z",
+      "StopTime": "2022-07-06T16:33:21.1574508Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 4,
+      "ConfigurationID": 9,
+      "Name": "PCR_Fresid",
+      "RevisionID": 9,
+      "StartTime": "2022-07-06T16:30:47.2237157Z",
+      "StopTime": "2022-07-06T16:33:11.3276381Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 5,
+      "ConfigurationID": 5,
+      "Name": "PCA_Sresid",
+      "RevisionID": 5,
+      "StartTime": "2022-07-06T16:30:53.5353108Z",
+      "StopTime": "2022-07-06T16:33:10.3672282Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 6,
+      "ConfigurationID": 4,
+      "Name": "PCA_Qresid",
+      "RevisionID": 4,
+      "StartTime": "2022-07-06T16:30:57.2174117Z",
+      "StopTime": "2022-07-06T16:33:10.3712221Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 7,
+      "ConfigurationID": 3,
+      "Name": "PCA_Fresid",
+      "RevisionID": 3,
+      "StartTime": "2022-07-06T16:31:00.753206Z",
+      "StopTime": "2022-07-06T16:33:10.3862232Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 8,
+      "ConfigurationID": 8,
+      "Name": "MLR",
+      "RevisionID": 8,
+      "StartTime": "2022-07-06T16:31:04.2529151Z",
+      "StopTime": "2022-07-06T16:33:23.5871083Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 9,
+      "ConfigurationID": 7,
+      "Name": "MCR",
+      "RevisionID": 7,
+      "StartTime": "2022-07-06T16:31:08.3880607Z",
+      "StopTime": "2022-07-06T16:33:10.3782262Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 10,
+      "ConfigurationID": 11,
+      "Name": "Batch",
+      "RevisionID": 11,
+      "StartTime": "2022-07-06T16:31:14.0408926Z",
+      "StopTime": "2022-07-06T16:33:11.0956388Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 11,
+      "ConfigurationID": 1,
+      "Name": "ASCII_PCA",
+      "RevisionID": 1,
+      "StartTime": "2022-07-06T16:31:21.1688333Z",
+      "StopTime": "2022-07-06T16:33:10.3762257Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 12,
+      "ConfigurationID": 6,
+      "Name": "SVMR",
+      "RevisionID": 6,
+      "StartTime": "2022-07-06T16:42:44.3044798Z",
+      "StopTime": "2022-07-06T16:44:53.6403903Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 13,
+      "ConfigurationID": 1,
+      "Name": "ASCII_PCA",
+      "RevisionID": 1,
+      "StartTime": "2022-07-06T16:42:50.6371386Z",
+      "StopTime": "2022-07-06T16:44:53.6353909Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 14,
+      "ConfigurationID": 2,
+      "Name": "SIMCA_PCA",
+      "RevisionID": 2,
+      "StartTime": "2022-07-06T16:42:51.0434161Z",
+      "StopTime": "2022-07-06T16:44:53.6403903Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 15,
+      "ConfigurationID": 3,
+      "Name": "PCA_Fresid",
+      "RevisionID": 3,
+      "StartTime": "2022-07-06T16:42:51.4500364Z",
+      "StopTime": "2022-07-06T16:44:53.6363927Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 16,
+      "ConfigurationID": 4,
+      "Name": "PCA_Qresid",
+      "RevisionID": 4,
+      "StartTime": "2022-07-06T16:42:51.827674Z",
+      "StopTime": "2022-07-06T16:44:54.1863981Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 17,
+      "ConfigurationID": 5,
+      "Name": "PCA_Sresid",
+      "RevisionID": 5,
+      "StartTime": "2022-07-06T16:42:52.2076121Z",
+      "StopTime": "2022-07-06T16:44:54.1863981Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 18,
+      "ConfigurationID": 7,
+      "Name": "MCR",
+      "RevisionID": 7,
+      "StartTime": "2022-07-06T16:42:52.6128767Z",
+      "StopTime": "2022-07-06T16:44:54.188396Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 19,
+      "ConfigurationID": 8,
+      "Name": "MLR",
+      "RevisionID": 8,
+      "StartTime": "2022-07-06T16:42:52.9902672Z",
+      "StopTime": "2022-07-06T16:44:54.1863981Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 20,
+      "ConfigurationID": 9,
+      "Name": "PCR_Fresid",
+      "RevisionID": 9,
+      "StartTime": "2022-07-06T16:42:53.3783159Z",
+      "StopTime": "2022-07-06T16:44:54.2073963Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 21,
+      "ConfigurationID": 10,
+      "Name": "PCR_Qresid",
+      "RevisionID": 10,
+      "StartTime": "2022-07-06T16:42:53.7495835Z",
+      "StopTime": "2022-07-06T16:44:54.8823272Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 22,
+      "ConfigurationID": 11,
+      "Name": "Batch",
+      "RevisionID": 11,
+      "StartTime": "2022-07-06T16:42:54.1350244Z",
+      "StopTime": "2022-07-06T16:44:54.8833274Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 26,
+      "ConfigurationID": 13,
+      "Name": "NoModConfig",
+      "RevisionID": 13,
+      "StartTime": "2022-08-15T18:20:50.8391994Z",
+      "StopTime": "2022-08-15T18:20:51.5165468Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 27,
+      "ConfigurationID": 13,
+      "Name": "NoModConfig",
+      "RevisionID": 14,
+      "StartTime": "2022-08-15T18:22:05.5597846Z",
+      "StopTime": "2022-08-15T18:22:52.4540204Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 29,
+      "ConfigurationID": 12,
+      "Name": "ConfigFases",
+      "RevisionID": 16,
+      "StartTime": "2022-08-22T20:58:49.6991188Z",
+      "StopTime": "2022-08-22T21:00:13.194734Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  },
+  {
+    "ConfigurationInfo": {
+      "RunID": 32,
+      "ConfigurationID": 12,
+      "Name": "ConfigFases",
+      "RevisionID": 16,
+      "StartTime": "2022-08-26T17:53:40.340667Z",
+      "StopTime": "2022-08-26T17:57:22.7931633Z"
+    },
+    "TagsInfo": {
+      "MetadataTags": {
+        "Project Name": "Testing",
+        "Product": "Testing",
+        "Experiment ID": "Testing",
+        "Tag1": "Testing",
+        "Tag2": "Testing",
+        "Tag3": "Testing",
+        "Tag4": "Testing",
+        "Tag5": "Testing"
+      },
+      "PhaseTags": []
+    }
+  }
+]
