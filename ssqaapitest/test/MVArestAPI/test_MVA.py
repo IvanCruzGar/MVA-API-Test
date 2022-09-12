@@ -1,3 +1,4 @@
+from ast import Param
 from cmath import exp
 from fileinput import filename
 from xml.etree.ElementTree import ElementTree
@@ -90,32 +91,40 @@ class TestListElements(unittest.TestCase):
         self.assertEqual(info, structure,"Structure is wrong")
 
         #Check information of a random Model
-        aleat= random.randint(1, len(resDB))
+        aleat= random.randint(1, len(resAPI))
         logger.debug(aleat)
         #ModelID
         """ 
         logger.debug((resDB[aleat-1]['DataSourceID']))
         logger.debug(resAPI[-aleat]['Id']) """
         self.assertEqual((resDB[aleat-1]['ModelID']),(resAPI[aleat-1]['ModelId']))
-        #RevisionID
+        #ModelID
         """ logger.debug((resDB[aleat-1]['RevisionID']))
         logger.debug(resAPI[-aleat]['RevisionId']) """
-        self.assertEqual((resDB[aleat-1]['RevisionID']),(resAPI[aleat-1]['RevisionID']),'Revision')
+        Parametros={'RevisionID':resAPI[aleat-1]['RevisionID']}
+        resDBnew = dbConex.get_DataSet(table = 'ModelRevision',dbParams=Parametros)
+        self.assertEqual((resDBnew[0]['ModelID']),(resAPI[aleat-1]['ModelId']),'Revision')
         #Name
-        """ logger.debug((resDB2[aleat-1]['Name']))
-        logger.debug(resAPI[aleat-1]['Name']) """
-        self.assertEqual((resDB2[aleat-1]['Name']),(resAPI[aleat-1]['Name']))
+        #logger.debug(resAPI[aleat-1]['Name']) 
+        Name=resDB[aleat-1]['ModelInfo']
+        #logger.debug(Name[Name.find('name="')+6:Name.find('" modelsoftware')])
+        self.assertEqual((Name[Name.find('name="')+6:Name.find('" modelsoftware')]),(resAPI[aleat-1]['Name']))
         #Created
         """ logger.debug(str(resDB[aleat-1]['UploadDate'])[0:22])
         logger.debug(resAPI[-aleat]['UploadedDate'][0:10]+' '+resAPI[aleat-1]['UploadedDate'][11:22]) """
-        self.assertEqual(str(resDB[aleat-1]['UploadDate'])[0:22],(resAPI[aleat-1]['UploadedDate'][0:10]+' '+resAPI[aleat-1]['UploadedDate'][11:22]))
+        Parametros={'RevisionID':resAPI[aleat-1]['RevisionID']}
+        resDBnew = dbConex.get_DataSet(table = 'ModelRevision',dbParams=Parametros)
+        self.assertEqual(str(resDBnew[0]['UploadDate'])[0:22],(resAPI[aleat-1]['UploadedDate'][0:10]+' '+resAPI[aleat-1]['UploadedDate'][11:22]))
         #IsEnabled
         """ logger.debug(bool(resDB2[aleat-1]['Disabled']))
         logger.debug(resAPI[-aleat]['IsEnabled']) """
-        self.assertFalse(bool(resDB2[aleat-1]['Disabled']),resAPI[aleat-1]['IsEnabled'])
+        Parametros={'ModelId':resDB[aleat-1]['ModelID']}
+        resDBen = dbConex.get_DataSet(table = 'Model',dbParams=Parametros)
+        self.assertFalse(bool(resDBen[0]['Disabled']),resAPI[aleat-1]['IsEnabled'])
         #IsEnabled
-        """ logger.debug((resDB[aleat-1]['UploadedBy']))
-        logger.debug(resAPI[aleat-1]['UploadedBy']) """
+        
+        logger.debug((resDB[aleat-1]['UploadedBy']))
+        logger.debug(resAPI[aleat-1]['UploadedBy'])
         self.assertEqual((resDB[aleat-1]['UploadedBy']),resAPI[aleat-1]['UploadedBy'])
         
     #Use Case 689749: 8. Retrieve list of Configurations
@@ -417,7 +426,19 @@ class TestListElements(unittest.TestCase):
         self.assertEqual(res, resExp,"Something went wrong")
 
     #Use Case 689753: 12. Retrieve Result Matrices for Configuration Run
+    @pytest.mark.vsts792977
+    def test_RetrieveResultMatricesForConfigurationRun_ClassificationTable_SampleDistances(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMConfRun(RevID=14,Titulo='ClassificationTable_SampleDistances')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('ResMatConfRun.json')
+        self.assertEqual(res, resExp,"Something went wrong")
 
+
+
+        
     #Use Case 689754: 13. Retrieve Result Matrices by Name
 
 
@@ -818,7 +839,13 @@ class TestListElements(unittest.TestCase):
             variableNameDB=resDB12[0]['variable_name']
             nameApi=NotificationInfo[i]['Notification']
             variableNameAPi=NotificationInfo[i]['VariableName']
-            self.assertEqual(nameDB,nameApi,"Notification name  are different")
+            logger.debug(nameDB)
+            logger.debug(nameApi)
+            logger.debug(variableNameDB)
+            logger.debug(variableNameAPi)
+
+
+            self.assertEqual(nameDB,nameApi,"Notification name are different")
             self.assertEqual(variableNameDB,variableNameAPi,"Notification variable name  are different")
             
             #First result

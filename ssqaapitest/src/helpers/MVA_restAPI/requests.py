@@ -1,4 +1,5 @@
 
+from cmath import exp
 from ssqaapitest.src.utilities.requestsUtility import RequestsUtility
 from ssqaapitest.src.utilities.jsonUtility import JsonUtility
 from ssqaapitest.src.configs.hosts_config import API_HOSTS
@@ -120,7 +121,7 @@ class Endpoints(object):
         return api_res
 
     def get_RDStartStopTime(self,Titulo='', RevID=1,Start="",Stop="",expRes=200,empRes=False):
-        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID)+"&TimeStart="+str(Start)+"&TimeEnd=",expected_status_code=expRes,resEmpty=empRes)
+        api_res = self.requestUtility.get("/Configuration/RawData?ConfigurationRunId="+str(RevID)+"&TimeStart="+str(Start)+"&TimeEnd="+str(Stop),expected_status_code=expRes,resEmpty=empRes)
         with open('RawDataStartStopTime'+Titulo+'.json', 'w') as f:
             json.dump(api_res, f, indent=2)
             logger.debug('File Created')
@@ -184,17 +185,11 @@ class Endpoints(object):
         logger.debug(api_res)
         return api_res
 
-    def get_RRMNFull(self):
-        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=3?MatrixName=Scores")
-        # with open('ResMatFull.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('File Created')
-        logger.debug(api_res)
-        return api_res
+    
 
-    def get_RRMConfRun(self):
-        api_res = self.requestUtility.get("/Configuration/ResultTypes?configurationRunId=10")
-        with open('ResMatConfRun.json', 'w') as f:
+    def get_RRMConfRun(self,RevID=1,Titulo='',expRes = 200, empRes = False):
+        api_res = self.requestUtility.get("/Configuration/ResultTypes?configurationRunId="+str(RevID),expected_status_code=expRes,resEmpty=empRes)
+        with open('ResMatConfRun'+Titulo+'.json', 'w') as f:
             json.dump(api_res, f, indent=2)
             logger.debug('File Created')
         logger.debug(api_res)
@@ -206,4 +201,12 @@ class Endpoints(object):
         #     json.dump(api_res, f, indent=2)
         #     logger.debug('File Created')
         #logger.debug(api_res)
+        return api_res
+
+    def get_RRMNFull(self):
+        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=3?MatrixName=Scores")
+        # with open('ResMatFull.json', 'w') as f:
+        #     json.dump(api_res, f, indent=2)
+        #     logger.debug('File Created')
+        logger.debug(api_res)
         return api_res
