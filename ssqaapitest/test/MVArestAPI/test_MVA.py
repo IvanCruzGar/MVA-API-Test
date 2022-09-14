@@ -273,10 +273,12 @@ class TestListElements(unittest.TestCase):
         
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_RDIDOffset(RevID=1,Rows=2,Off=4)
+        res = endpoints.get_RDIDOffset(RevID=1,Rows=2,Off=109)
         jsonUtil = JsonUtility('MVArestAPI')
         resExp = jsonUtil.read_Json('RawDataIDOffsetandRows.json')
         self.assertEqual(res, resExp,"Something went wrong")
+
+    
 
     @pytest.mark.vsts791778
     def test_RetrieveRawData_OffsetAndRows_IncorrectQuery(self):
@@ -319,7 +321,7 @@ class TestListElements(unittest.TestCase):
         
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_RDIDOffset(RevID=1,Rows=5,Off=10,Titulo='PartiallyOutOfScope')
+        res = endpoints.get_RDIDOffset(RevID=1,Rows=5,Off=114,Titulo='PartiallyOutOfScope')
         jsonUtil = JsonUtility('MVArestAPI')
         resExp = jsonUtil.read_Json('RawDataIDOffsetandRowsPartiallyOutOfScope.json')
         self.assertEqual(res, resExp,"Something went wrong")
@@ -355,7 +357,7 @@ class TestListElements(unittest.TestCase):
         
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_RDStartStopTime(RevID=1,Start="2022-07-06 16:30:32.7003273",Stop="2022-07-06 17:30:12.13",expRes=204,empRes=True,Titulo="NoconfigurationExistswithspecifeidstoptime")
+        res = endpoints.get_RDStartStopTime(RevID=1,Start="2022-07-06 16:25:00.00",Stop="2022-07-06T16:32:36.04",expRes=204,empRes=True,Titulo="NoconfigurationExistswithspecifeidstoptime")
         self.assertEqual(res, res,"Something went wrong")
 
     @pytest.mark.vsts797792
@@ -363,7 +365,7 @@ class TestListElements(unittest.TestCase):
         
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_RDStartStopTime(RevID=1,Start="2022-07-06 15:20:16.30",Stop="2022-07-06 16:33:11.1126355",expRes=204,empRes=True,Titulo="NoconfigurationExistswithspecifeidsarttime")
+        res = endpoints.get_RDStartStopTime(RevID=1,Start="2022-07-06T16:32:38.00",Stop="2022-07-06T16:32:38.50",expRes=204,empRes=True,Titulo="NoconfigurationExistswithspecifeidsarttime")
         self.assertEqual(res, res,"Something went wrong")
 
     @pytest.mark.vsts797931
@@ -387,7 +389,7 @@ class TestListElements(unittest.TestCase):
         
         logger.debug(self.id())
         endpoints = Endpoints()
-        res = endpoints.get_RDStartTime(RevID=1,Start="2022-07-06 16:30:32.7003273")
+        res = endpoints.get_RDStartTime(RevID=1,Start="2022-07-06T16:32:36.0523491")
         jsonUtil = JsonUtility('MVArestAPI')
         resExp = jsonUtil.read_Json('RawDataStartTime.json')
         self.assertEqual(res, resExp,"Something went wrong")
@@ -433,7 +435,37 @@ class TestListElements(unittest.TestCase):
         endpoints = Endpoints()
         res = endpoints.get_RRMConfRun(RevID=14,Titulo='ClassificationTable_SampleDistances')
         jsonUtil = JsonUtility('MVArestAPI')
-        resExp = jsonUtil.read_Json('ResMatConfRun.json')
+        resExp = jsonUtil.read_Json('ResMatConfRunClassificationTable_SampleDistances.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792984
+    def test_RetrieveResultMatricesForConfigurationRun_Concentration(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMConfRun(RevID=18,Titulo='Concentration')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('ResMatConfRunConcentration.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788391
+    def test_RetrieveResultMatricesForConfigurationRun_Scores_HotellingsT2_Residuals_FResiduals(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMConfRun(RevID=13,Titulo='Scores_HotellingsT2_Residuals_FResiduals')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('ResMatConfRunConcentration_Scores_HotellingsT2_Residuals_FResiduals.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792978
+    def test_RetrieveResultMatricesForConfigurationRun_YPrediction_YCorrected(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMConfRun(RevID=19,Titulo='YPrediction_YCorrected')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('ResMatConfRunConcentration_YPrediction_YCorrected.json')
         self.assertEqual(res, resExp,"Something went wrong")
 
 
@@ -441,6 +473,223 @@ class TestListElements(unittest.TestCase):
         
     #Use Case 689754: 13. Retrieve Result Matrices by Name
 
+    @pytest.mark.vsts788393
+    def test_RetrieveResultMatricesByName_FullList(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameFullList(RevID=14,MatrixName='Scores')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyName.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792196
+    def test_RetrieveResultMatricesByName_MatrixNonexistentfortheConfigurationRun(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameFullList(RevID=1,MatrixName='Scores',Titulo='MatrixNonexistentfortheCOnfigurationRun',expRes=204,empRes=True)
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyName.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792197
+    def test_RetrieveResultMatricesByName_NonExistingResultMatrix(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameFullList(RevID=14,MatrixName='NonExistingMatrix',Titulo='MatrixNonexistentMatrix',expRes=400,empRes=True)
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyName.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788392
+    def test_RetrieveResultMatricesByName_NotValidConfigurationID(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameFullList(RevID=0,MatrixName='Scores',expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts792193
+    def test_RetrieveResultMatricesByName_NonexistingConfigurationRun(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameFullList(RevID=99,MatrixName='Scores',expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts788398
+    def test_RetrieveResultMatricesByName_OffsetandRows(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameOffsetAndRows(RevID=14,MatrixName='Scores',Titulo='OffsetNRows',Offset='2',Rows='2')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyNameOffsetNRows.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792191
+    def test_RetrieveResultMatricesByName_OffsetandRows_InvalidRow(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameOffsetAndRows(RevID=14,MatrixName='Scores',Offset='0',Rows='2',expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts792189
+    def test_RetrieveResultMatricesByName_OffsetandRows_RowsPartiallyOutOfScope(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameOffsetAndRows(RevID=14,MatrixName='Scores',Titulo='OffsetNRowsRowsPartiallyOutOfScope',Offset='3',Rows='20')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyNameOffsetNRowsRowsPartiallyOutOfScope.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792190
+    def test_RetrieveResultMatricesByName_OffsetandRows_SpecifiedRowsOutOfScope(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameOffsetAndRows(RevID=14,MatrixName='Scores',Titulo='OffsetNRowsSpecifiedRowsOutOfScope',Offset='20',Rows='5')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyNameOffsetNRowsSpecifiedRowsOutOfScope.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792188
+    def test_RetrieveResultMatricesByName_OffsetandRows_UpperLimit(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameOffsetAndRows(RevID=14,MatrixName='Scores',Titulo='OffsetNRowsUpperLimit',Offset='10',Rows='1')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyNameOffsetNRowsUpperLimit.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792187
+    def test_RetrieveResultMatricesByName_OffsetandRows_LowerLimit(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameOffsetAndRows(RevID=14,MatrixName='Scores',Titulo='OffsetNRowsLowerLimit',Offset='1',Rows='1')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyNameOffsetNRowsLowerLimit.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts788415
+    def test_RetrieveResultMatricesByName_StartandStopTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameStartnStop(RevID=1,StartTime="2022-07-06 16:30:32.7003273",StopTime="2022-07-06 16:33:11.1126355",RevID=14,MatrixName='Scores',Titulo='StartnStop')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyNameStartnStop.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792939
+    def test_RetrieveResultMatricesByName_StartandStopTime_NoConfigurationRunExistwithSpecifiedStartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameStartnStop(RevID=1,StartTime="2022-07-06T16:32:38.00",StopTime="2022-07-06T16:32:38.50",RevID=14,MatrixName='Scores',expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+    
+    @pytest.mark.vsts792940
+    def test_RetrieveResultMatricesByName_StartandStopTime_NoConfigurationRunExistwithSpecifiedStopTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameStartnStop(RevID=1,StartTime="2022-07-06 16:25:00.00",StopTime="2022-07-06T16:32:36.04",RevID=14,MatrixName='Scores',expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts792936
+    def test_RetrieveResultMatricesByName_StartandStopTime_NotValidStartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameStartnStop(RevID=1,StartTime="2022-07-06 16:30:32.7003273",StopTime="2022-07-06 16:15:32.7003273",RevID=14,MatrixName='Scores',expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts792937
+    def test_RetrieveResultMatricesByName_StartandStopTime_NotValidStopTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameStartnStop(RevID=1,StartTime="-2022-07-06 15:20:16.30",StopTime="2022-07-06 16:33:11.1126355",RevID=14,MatrixName='Scores',expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+    
+    @pytest.mark.vsts788413
+    def test_RetrieveResultMatricesByName_StartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameStartnStop(RevID=1,StartTime="2022-07-06 16:30:32.7003273",RevID=14,MatrixName='Scores',Titulo='StartnStop')
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyNameStartnStop.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts792944
+    def test_RetrieveResultMatricesByName_StartTime_NoConfigurationRunExistwithSpecifiedStartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameStartTime(RevID=1,StartTime="2022-07-06T16:32:38.00",RevID=14,MatrixName='Scores',expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts792942
+    def test_RetrieveResultMatricesByName_StartTime_NotValidStartTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameStartTime(RevID=1,StartTime="2022-07-06 16:30:-32.7003273",RevID=14,MatrixName='Scores',expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+
+    @pytest.mark.vsts797606
+    def test_RetrieveResultMatricesByName_LastN(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameLastN(RevID=14,MatrixName='Scores',Titulo='LastNRows',LRows=2)
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyNameLastNRows.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+    @pytest.mark.vsts798155
+    def test_RetrieveResultMatricesByName_LastN_InvalidNumberOfRows(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameLastN(RevID=14,MatrixName='Scores',Titulo='LastNRows',LRows=0,expRes=400,empRes=True)
+        jsonUtil = JsonUtility('MVArestAPI')
+        resExp = jsonUtil.read_Json('RetResMatbyNameLastNRows.json')
+        self.assertEqual(res, resExp,"Something went wrong")
+
+
+    @pytest.mark.vsts798158
+    def test_RetrieveResultMatricesByName_Recent_InvalidRecentTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameRecent(RevID=14,MatrixName='Scores',Titulo='InvalidRecentTime',RTime=-500,expRes=400,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts798160
+    def test_RetrieveResultMatricesByName_Recent_NoConfigurationRunExistintheSpecifiedRecentTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameRecent(RevID=14,MatrixName='Scores',RTime=500,expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
+
+    @pytest.mark.vsts798160
+    def test_RetrieveResultMatricesByName_Recent_NoConfigurationRunExistintheSpecifiedRecentTime(self):
+        
+        logger.debug(self.id())
+        endpoints = Endpoints()
+        res = endpoints.get_RRMatricesNameRecent(RevID=14,MatrixName='Scores',RTime=500,expRes=204,empRes=True)
+        self.assertEqual(res, res,"Something went wrong")
 
 
     #Use Case 764933: 14.2. Retrieve Model Metadata by Model Revision Id
@@ -663,8 +912,8 @@ class TestListElements(unittest.TestCase):
         #Check API response structure
         info=list(resAPI[0].keys())
         logger.debug(info)
-        structure= ['Configuration ID', 'Configuration Name', 'Revision Number', 'Method Name', 'Model Name', 'Transformations', 'Online Calculations', 'Output', 'Notifications']
-        #self.assertEqual(info, structure,"Structure is different")
+        structure= ['Configuration ID', 'Configuration Name', 'Revision Number', 'Data Source Name', 'Data Source ID', 'Data Source Revision Number', 'Data Source Revision ID', 'Method Name', 'Model Name', 'Model ID', 'Model Revision Number', 'Model Revision ID', 'Transformations', 'Online Calculations', 'Output', 'Notifications', 'Users With Access']
+        self.assertEqual(info, structure,"Structure is different")
 
         #Check Configuration ID
         # logger.debug(resDB[ConfID-1]['ConfigurationID'])

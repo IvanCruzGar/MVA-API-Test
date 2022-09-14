@@ -2,6 +2,7 @@
   {
     "ConfigId": 1,
     "ConfigName": "ASCII_PCA",
+    "RevisionID": 1,
     "RevisionNumber": 1,
     "MethodName": "PCA",
     "CreatedDate": "2022-06-28T21:35:01.847",
@@ -12,6 +13,7 @@
   {
     "ConfigId": 2,
     "ConfigName": "SIMCA_PCA",
+    "RevisionID": 2,
     "RevisionNumber": 1,
     "MethodName": "SIMCA",
     "CreatedDate": "2022-07-05T17:43:43.507",
@@ -22,6 +24,7 @@
   {
     "ConfigId": 3,
     "ConfigName": "PCA_Fresid",
+    "RevisionID": 3,
     "RevisionNumber": 1,
     "MethodName": "PCA",
     "CreatedDate": "2022-07-05T18:27:44.067",
@@ -32,6 +35,7 @@
   {
     "ConfigId": 4,
     "ConfigName": "PCA_Qresid",
+    "RevisionID": 4,
     "RevisionNumber": 1,
     "MethodName": "PCA",
     "CreatedDate": "2022-07-05T18:28:45.44",
@@ -42,6 +46,7 @@
   {
     "ConfigId": 5,
     "ConfigName": "PCA_Sresid",
+    "RevisionID": 5,
     "RevisionNumber": 1,
     "MethodName": "PCA",
     "CreatedDate": "2022-07-05T18:29:31.99",
@@ -52,6 +57,7 @@
   {
     "ConfigId": 6,
     "ConfigName": "SVMR",
+    "RevisionID": 6,
     "RevisionNumber": 1,
     "MethodName": "SVMR",
     "CreatedDate": "2022-07-06T16:04:42.81",
@@ -62,6 +68,7 @@
   {
     "ConfigId": 7,
     "ConfigName": "MCR",
+    "RevisionID": 7,
     "RevisionNumber": 1,
     "MethodName": "MCR",
     "CreatedDate": "2022-07-06T16:20:29.253",
@@ -72,6 +79,7 @@
   {
     "ConfigId": 8,
     "ConfigName": "MLR",
+    "RevisionID": 8,
     "RevisionNumber": 1,
     "MethodName": "MLR",
     "CreatedDate": "2022-07-06T16:21:16.807",
@@ -82,6 +90,7 @@
   {
     "ConfigId": 9,
     "ConfigName": "PCR_Fresid",
+    "RevisionID": 9,
     "RevisionNumber": 1,
     "MethodName": "Predict",
     "CreatedDate": "2022-07-06T16:23:22.247",
@@ -92,6 +101,7 @@
   {
     "ConfigId": 10,
     "ConfigName": "PCR_Qresid",
+    "RevisionID": 10,
     "RevisionNumber": 1,
     "MethodName": "Predict",
     "CreatedDate": "2022-07-06T16:24:21.03",
@@ -102,6 +112,7 @@
   {
     "ConfigId": 11,
     "ConfigName": "Batch",
+    "RevisionID": 11,
     "RevisionNumber": 1,
     "MethodName": "Batch",
     "CreatedDate": "2022-07-06T16:30:08.177",
@@ -112,6 +123,7 @@
   {
     "ConfigId": 12,
     "ConfigName": "ConfigFases",
+    "RevisionID": 12,
     "RevisionNumber": 1,
     "MethodName": "PCA",
     "CreatedDate": "2022-07-27T13:54:14.07",
@@ -122,6 +134,7 @@
   {
     "ConfigId": 13,
     "ConfigName": "NoModConfig",
+    "RevisionID": 13,
     "RevisionNumber": 1,
     "MethodName": "No Model",
     "CreatedDate": "2022-08-15T18:20:40.46",
@@ -132,6 +145,7 @@
   {
     "ConfigId": 13,
     "ConfigName": "NoModConfig",
+    "RevisionID": 14,
     "RevisionNumber": 2,
     "MethodName": "No Model",
     "CreatedDate": "2022-08-15T18:22:00.517",
@@ -142,6 +156,7 @@
   {
     "ConfigId": 12,
     "ConfigName": "ConfigFases",
+    "RevisionID": 15,
     "RevisionNumber": 2,
     "MethodName": "PCA",
     "CreatedDate": "2022-08-22T20:54:16.05",
@@ -152,10 +167,22 @@
   {
     "ConfigId": 12,
     "ConfigName": "ConfigFases",
+    "RevisionID": 16,
     "RevisionNumber": 3,
     "MethodName": "PCA",
     "CreatedDate": "2022-08-22T20:58:30.357",
     "Status": "Stopped",
+    "IsEnabled": true,
+    "IsApproved": false
+  },
+  {
+    "ConfigId": 14,
+    "ConfigName": "cdmValue",
+    "RevisionID": 17,
+    "RevisionNumber": 1,
+    "MethodName": "No Model",
+    "CreatedDate": "2022-09-08T21:10:42.557",
+    "Status": "",
     "IsEnabled": true,
     "IsApproved": false
   }

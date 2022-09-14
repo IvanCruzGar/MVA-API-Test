@@ -195,18 +195,50 @@ class Endpoints(object):
         logger.debug(api_res)
         return api_res
 
-    def get_RRMatricesNameFullList(self):
-        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=1?MatrixName=Scores", expected_status_code = 200, resEmpty = True)
-        # with open('RConfMetaConfId.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('File Created')
-        #logger.debug(api_res)
+    def get_RRMatricesNameFullList(self,RevID=1,Titulo='',MatrixName='Scores',expRes = 200, empRes = False):
+        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationRunId="+str(RevID)+"&MatrixName="+str(MatrixName), expected_status_code = expRes, resEmpty = empRes)
+        with open('RetResMatbyName'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
         return api_res
 
-    def get_RRMNFull(self):
-        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationId=3?MatrixName=Scores")
-        # with open('ResMatFull.json', 'w') as f:
-        #     json.dump(api_res, f, indent=2)
-        #     logger.debug('File Created')
+    def get_RRMatricesNameLastN(self,RevID=1,Titulo='',MatrixName='Scores',expRes = 200, empRes = False,LRows='1'):
+        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationRunId="+str(RevID)+"&MatrixName="+str(MatrixName)+"&LastN="+str(LRows), expected_status_code = expRes, resEmpty = empRes)
+        with open('RetResMatbyName'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
+
+    def get_RRMatricesNameOffsetAndRows(self,RevID=1,Titulo='',MatrixName='Scores',expRes = 200, empRes = False,Offset='1',Rows='1'):
+        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationRunId="+str(RevID)+"&MatrixName="+str(MatrixName)+"&offset="+str(Offset)+"&rows="+str(Rows), expected_status_code = expRes, resEmpty = empRes)
+        with open('RetResMatbyName'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
+
+    def get_RRMatricesNameRecent(self,RevID=1,Titulo='',MatrixName='Scores',expRes = 200, empRes = False,RTime=1):
+        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationRunId="+str(RevID)+"&MatrixName="+str(MatrixName)+"&Recent="+str(RTime), expected_status_code = expRes, resEmpty = empRes)
+        with open('RetResMatbyName'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
+
+    def get_RRMatricesNameStartnStop(self,RevID=1,Titulo='',MatrixName='Scores',expRes = 200, empRes = False,StartTime=1,StopTime=1):
+        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationRunId="+str(RevID)+"&MatrixName="+str(MatrixName)+"&TimeStart="+str(StartTime)+"&TimeEnd="+str(StopTime), expected_status_code = expRes, resEmpty = empRes)
+        with open('RetResMatbyName'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
+        logger.debug(api_res)
+        return api_res
+
+    def get_RRMatricesNameStartTime(self,RevID=1,Titulo='',MatrixName='Scores',expRes = 200, empRes = False,StartTime=1):
+        api_res = self.requestUtility.get("/Configuration/ResultMatrices?configurationRunId="+str(RevID)+"&MatrixName="+str(MatrixName)+"&TimeStart="+str(StartTime), expected_status_code = expRes, resEmpty = empRes)
+        with open('RetResMatbyName'+Titulo+'.json', 'w') as f:
+            json.dump(api_res, f, indent=2)
+            logger.debug('File Created')
         logger.debug(api_res)
         return api_res
